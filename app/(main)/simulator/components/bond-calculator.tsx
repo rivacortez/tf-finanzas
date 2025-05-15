@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {  AlertTriangle } from "lucide-react";
-import { generatePaymentSchedule, BondParams } from "@/lib/finance/bond-calculator";
+import { generatePaymentSchedule, BondParams, PaymentRow, Indicators } from "@/lib/finance/bond-calculator";
 import PaymentSchedule from "./payment-schedule";
 import FinancialIndicators from "./financial-indicators";
 import SbsCompliance from "./sbs-compliance";
@@ -22,8 +22,8 @@ export default function BondCalculator({ bondParams }: BondCalculatorProps) {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("schedule");
   const [calculationResult, setCalculationResult] = useState<{
-    schedule: any[];
-    indicators: any;
+    schedule: PaymentRow[];
+    indicators: Indicators;
   } | null>(null);
 
   useEffect(() => {
