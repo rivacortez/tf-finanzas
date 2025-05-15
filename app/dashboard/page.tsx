@@ -82,7 +82,7 @@ export default function DashboardPage() {
           </CardContent>
           <CardFooter>
             <Button asChild variant="outline" size="sm" className="w-full">
-              <Link href="/bonds">Acceder</Link>
+              <Link href="/bonds-management">Acceder</Link>
             </Button>
           </CardFooter>
         </Card>

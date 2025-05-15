@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { InfoIcon, AlertTriangle } from "lucide-react";
+import {  AlertTriangle } from "lucide-react";
 import { generatePaymentSchedule, BondParams } from "@/lib/finance/bond-calculator";
 import PaymentSchedule from "./payment-schedule";
 import FinancialIndicators from "./financial-indicators";

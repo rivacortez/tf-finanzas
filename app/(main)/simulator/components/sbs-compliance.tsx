@@ -8,7 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { BondParams } from "@/lib/finance/bond-calculator";
-import { SBS_REGULATIONS, validateBondParams, ValidationResult } from "@/lib/finance/sbs-validator";
+import { SBS_REGULATIONS } from "@/lib/finance/sbs-validator";
 
 interface SbsComplianceProps {
   bondParams: BondParams;

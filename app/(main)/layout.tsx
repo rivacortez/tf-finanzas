@@ -2,33 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-	Calculator,
-	Home,
-	FileText,
-	ChevronRight,
-	BarChart3,
-	LineChart,
-	ShieldCheck,
-	Table,
-	CalendarDays
-} from "lucide-react";
+
 
 import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarHeader,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
+	
 	SidebarProvider,
-	SidebarSeparator,
 	SidebarTrigger,
 	SidebarInset,
-	SidebarMenuSub,
-	SidebarMenuSubButton,
-	SidebarMenuSubItem,
+	
 } from "@/components/ui/sidebar";
 
 import { Navbar } from "@/components/ui/navbar";
@@ -40,9 +21,7 @@ export default function MainLayout({
 }) {
 	const pathname = usePathname();
 
-	const isActive = (path: string) => {
-		return pathname === path;
-	};
+	
 
 	return (
 		<Navbar>
