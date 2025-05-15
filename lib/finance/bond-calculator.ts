@@ -271,7 +271,6 @@ export function calculateConvexity(cashFlows: number[], rate: number, price: num
 export function generatePaymentSchedule(params: BondParams): { schedule: PaymentRow[], indicators: Indicators } {
   const {
     amount,
-    currency,
     term,
     rateType,
     rateValue,

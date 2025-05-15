@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
-import FinancialIndicators from "../components/financial-indicators";
-import SbsCompliance from "../components/sbs-compliance";
-import PaymentSchedule from "../components/payment-schedule";
+
 import BondCalculator from "../components/bond-calculator";
 
 // Tipo para los parámetros del bono
@@ -49,11 +46,11 @@ type Indicators = {
 export default function ResultsPage() {
   const searchParams = useSearchParams();
   const [bondParams, setBondParams] = useState<BondParams | null>(null);
-  const [schedule, setSchedule] = useState<PaymentRow[]>([]);
-  const [indicators, setIndicators] = useState<Indicators | null>(null);
+  const [ setSchedule] = useState<PaymentRow[]>([]);
+  const [ setIndicators] = useState<Indicators | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("schedule");
+  const [ setActiveTab] = useState("schedule");
 
   // Efecto para manejar el hash de la URL y cambiar la pestaña activa
   useEffect(() => {
@@ -206,7 +203,7 @@ export default function ResultsPage() {
 }
 
 // Función para obtener la etiqueta del periodo de capitalización
-function getCapitalizationLabel(cap: string): string {
+/*function getCapitalizationLabel(cap: string): string {
   const labels: Record<string, string> = {
     monthly: "mensual",
     bimonthly: "bimestral",
@@ -216,4 +213,4 @@ function getCapitalizationLabel(cap: string): string {
   };
   
   return labels[cap] || cap;
-}
+}*/
