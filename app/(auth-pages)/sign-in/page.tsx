@@ -31,9 +31,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
             <h2 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-gray-100">
               Accede a tu cuenta
             </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Administra tus proyectos y colabora con tu equipo de forma segura.
-            </p>
+           
           </div>
         </div>
 
