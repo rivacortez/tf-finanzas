@@ -244,7 +244,7 @@ export default function SimulatorPage() {
                       <div className="space-y-2">
                         <Label htmlFor="capitalization">Período de Capitalización</Label>
                         <Select 
-                          onValueChange={(value) => form.setValue("capitalization", value as any)}
+                          onValueChange={(value) => form.setValue("capitalization", value as FormValues["capitalization"])}
                           defaultValue={form.getValues("capitalization") || "monthly"}
                         >
                           <SelectTrigger className="rounded-lg">

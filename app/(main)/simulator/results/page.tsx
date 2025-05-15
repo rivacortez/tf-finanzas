@@ -22,26 +22,6 @@ type BondParams = {
   commission: boolean;
 };
 
-// Tipo para las cuotas del cronograma
-type PaymentRow = {
-  number: number;
-  date: string;
-  principal: number;
-  interest: number;
-  insurance: number;
-  commission: number;
-  total: number;
-  balance: number;
-};
-
-// Tipo para los indicadores financieros
-type Indicators = {
-  tcea: number;
-  trea: number;
-  duration: number;
-  modifiedDuration: number;
-  convexity: number;
-};
 
 export default function ResultsPage() {
   const searchParams = useSearchParams();
