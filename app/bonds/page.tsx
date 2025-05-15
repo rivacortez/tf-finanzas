@@ -134,16 +134,30 @@ export default function BondsPage() {
             <div className="space-y-1">
               <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">
                 {
-                  mockBonds.filter(bond => bond.status === "active")
-                    .sort((a, b) => new Date(a.nextPayment?.split('/').reverse().join('-') || '') - 
-                                     new Date(b.nextPayment?.split('/').reverse().join('-') || ''))[0]?.nextPayment || "N/A"
+                  (() => {
+                    const activeBonds = mockBonds.filter(bond => bond.status === "active" && bond.nextPayment);
+                    if (activeBonds.length === 0) return "N/A";
+                    activeBonds.sort((a, b) => {
+                      const dateA = a.nextPayment ? new Date(a.nextPayment.split('/').reverse().join('-')).getTime() : Infinity;
+                      const dateB = b.nextPayment ? new Date(b.nextPayment.split('/').reverse().join('-')).getTime() : Infinity;
+                      return dateA - dateB;
+                    });
+                    return activeBonds[0].nextPayment;
+                  })()
                 }
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Bono: {
-                  mockBonds.filter(bond => bond.status === "active")
-                    .sort((a, b) => new Date(a.nextPayment?.split('/').reverse().join('-') || '') - 
-                                     new Date(b.nextPayment?.split('/').reverse().join('-') || ''))[0]?.id || "N/A"
+                  (() => {
+                    const activeBonds = mockBonds.filter(bond => bond.status === "active" && bond.nextPayment);
+                    if (activeBonds.length === 0) return "N/A";
+                    activeBonds.sort((a, b) => {
+                      const dateA = a.nextPayment ? new Date(a.nextPayment.split('/').reverse().join('-')).getTime() : Infinity;
+                      const dateB = b.nextPayment ? new Date(b.nextPayment.split('/').reverse().join('-')).getTime() : Infinity;
+                      return dateA - dateB;
+                    });
+                    return activeBonds[0].id;
+                  })()
                 }
               </p>
             </div>
@@ -213,7 +227,7 @@ export default function BondsPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={bond.status === "active" ? "default" : "success"}>
+                    <Badge variant={bond.status === "active" ? "default" : "secondary"}>
                       {bond.status === "active" ? "Activo" : "Completado"}
                     </Badge>
                   </TableCell>
