@@ -72,10 +72,21 @@ export function UserProfileMenu() {
     return user.email.charAt(0).toUpperCase();
   };
 
+  // Obtener nombre del usuario para mostrar junto al avatar
+  const getUserName = () => {
+    return (
+      user.user_metadata?.user_name ||
+      user.user_metadata?.name ||
+      user.user_metadata?.full_name ||
+      user.email?.split("@")[0] ||
+      "Usuario"
+    );
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+        <button className="relative rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 flex items-center gap-2">
           <Avatar className="size-9 cursor-pointer hover:opacity-90 transition-opacity">
             <AvatarImage 
               src={user.user_metadata?.avatar_url || user.user_metadata?.picture} 
@@ -85,6 +96,8 @@ export function UserProfileMenu() {
               {getUserInitials()}
             </AvatarFallback>
           </Avatar>
+          {/* Mostrar nombre si está disponible */}
+          <span className="hidden sm:inline text-sm font-medium text-foreground max-w-[120px] truncate">{getUserName()}</span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">

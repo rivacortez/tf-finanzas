@@ -1,3 +1,5 @@
+import { Bono } from "@/app/core/interfaces";
+
 export interface User {
     id: string;
     username: string;
@@ -9,4 +11,6 @@ export interface User {
         role: string;
       };
     }[];
+    bonos?: Bono[];
   }
+  

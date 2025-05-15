@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { ModeToggle } from "@/components/ui/mode-toggle"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, Package, Grid3X3, Settings, Users, FileText, Bell, ChevronRight } from "lucide-react"
+import { Menu, Package, Grid3X3, Settings, Users, FileText, Bell, ChevronRight, Home, Calculator, BookOpen } from "lucide-react"
 import { UserProfileMenu } from "@/components/ui/user-profile-menu"
 
 export function Navbar({ children }: { children?: React.ReactNode }) {
@@ -22,14 +22,12 @@ export function Navbar({ children }: { children?: React.ReactNode }) {
   }, [])
 
   const menuItems = [
-    //{ name: "Dashboard", icon: LayoutDashboard, href: "/dashboard", section: "Principal" },
-    { name: "Productos", icon: Package, href: "/management-products/products", section: "Gestión" },
-    { name: "Categorías", icon: Grid3X3, href: "/management-products/categories", section: "Gestión" },
-    { name: "Proveedores", icon: Users, href: "/management-suppliers/supplier-list", section: "Gestión" },
-    { name: "Productos-Proveedores", icon: Package, href: "/management-suppliers/product-supplier-management", section: "Gestión" },
-    { name: "Comparación de Proveedores", icon: FileText, href: "/management-suppliers/supplier-inventory-comparison", section: "Gestión" },
-    { name: "Órdenes de Compra", icon: FileText, href: "/purchases/orders", section: "Compras" },
-    { name: "Configuración", icon: Settings, href: "/settings", section: "Sistema" },
+    { name: "Dashboard", icon: Home, href: "/dashboard" },
+    { name: "Simulador de Bonos", icon: Calculator, href: "/simulator" },
+    { name: "Mis Bonos", icon: FileText, href: "/bonds" },
+    { name: "Gestión de Bonos", icon: Package, href: "/bond-management" },
+    { name: "Documentación", icon: BookOpen, href: "/documentation" },
+    { name: "Perfil", icon: Users, href: "/profile" },
   ]
 
   return (
@@ -95,53 +93,34 @@ export function Navbar({ children }: { children?: React.ReactNode }) {
           <div className="h-full py-4 flex flex-col">
             <div className="space-y-1 px-3 mb-8">
               <div className={`flex items-center justify-between mb-6 ${!sidebarOpen && 'opacity-0'}`}>
-                <h3 className="font-medium text-sm text-gray-500">Navegación</h3>
               </div>
             </div>
 
             {/* Contenedor con secciones de menú */}
-            <div className="flex-1 overflow-y-auto px-3 space-y-6">
-              {/* Agrupar elementos por sección */}
-              {["Principal", "Gestión", "Compras", "Sistema"].map((section) => (
-                <div key={section} className="space-y-1">
-                  <h2 className={`text-xs uppercase font-semibold text-gray-500 dark:text-gray-400 tracking-wider mb-2 transition-opacity duration-300 ${!sidebarOpen && 'opacity-0 h-0'}`}>
-                    {section}
-                  </h2>
-                  
-                  {menuItems.filter(item => item.section === section).map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={`group flex items-center rounded-xl transition-all duration-300 ${
-                        pathname === item.href
-                          ? "bg-gradient-to-r from-primary-500/20 to-primary-400/10 text-primary-600 dark:text-primary-400 font-medium" 
-                          : "hover:bg-gray-100 dark:hover:bg-gray-800/50 text-gray-700 dark:text-gray-300"
-                      } ${sidebarOpen ? "px-3 py-2" : "justify-center p-3"}`}
-                    >
-                      <item.icon 
-                        size={20} 
-                        className={`${
-                          pathname === item.href
-                            ? "text-primary-500"
-                            : "text-gray-500 dark:text-gray-400 group-hover:text-primary-500 dark:group-hover:text-primary-400"
-                        } transition-colors duration-200`}
-                      />
-                      
-                      {sidebarOpen && (
-                        <>
-                          <span className="ml-3 truncate">{item.name}</span>
-                          <ChevronRight 
-                            size={16} 
-                            className={`ml-auto transition-transform duration-300 ${
-                              pathname === item.href ? "opacity-100" : "opacity-0 group-hover:opacity-70"
-                            }`}
-                          />
-                        </>
-                      )}
-                    </Link>
-                  ))}
-                </div>
+            <div className="flex-1 overflow-y-auto px-3 space-y-2">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`group flex items-center rounded-xl transition-all duration-300 ${
+                    pathname === item.href
+                      ? "bg-gradient-to-r from-primary-500/20 to-primary-400/10 text-primary-600 dark:text-primary-400 font-medium"
+                      : "hover:bg-gray-100 dark:hover:bg-gray-800/50 text-gray-700 dark:text-gray-300"
+                  } ${sidebarOpen ? "px-3 py-2" : "justify-center p-3"}`}
+                >
+                  <item.icon
+                    size={20}
+                    className={`$ {
+                      pathname === item.href
+                        ? "text-primary-500"
+                        : "text-gray-500 dark:text-gray-400 group-hover:text-primary-500 dark:group-hover:text-primary-400"
+                    } transition-colors duration-200`}
+                  />
+                  {sidebarOpen && (
+                    <span className="ml-3 truncate">{item.name}</span>
+                  )}
+                </Link>
               ))}
             </div>
           </div>

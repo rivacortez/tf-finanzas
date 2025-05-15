@@ -1,3 +1,36 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+	Calculator,
+	Home,
+	FileText,
+	ChevronRight,
+	BarChart3,
+	LineChart,
+	ShieldCheck,
+	Table,
+	CalendarDays
+} from "lucide-react";
+
+import {
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarHeader,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarProvider,
+	SidebarSeparator,
+	SidebarTrigger,
+	SidebarInset,
+	SidebarMenuSub,
+	SidebarMenuSubButton,
+	SidebarMenuSubItem,
+} from "@/components/ui/sidebar";
+
 import { Navbar } from "@/components/ui/navbar";
 
 export default function MainLayout({
@@ -5,9 +38,37 @@ export default function MainLayout({
 }: {
 	children: React.ReactNode;
 }) {
+	const pathname = usePathname();
+
+	const isActive = (path: string) => {
+		return pathname === path;
+	};
+
 	return (
 		<Navbar>
-			{children}
+			<SidebarProvider>
+				<div className="flex min-h-screen">
+					
+
+					<div className="flex flex-1 flex-col">
+						<header className="flex h-16 items-center border-b px-6">
+							<SidebarTrigger />
+							<div className="ml-4 font-semibold">EduBono Perú</div>
+							<div className="ml-auto flex items-center gap-4">
+								<Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
+									Volver al Dashboard
+								</Link>
+							</div>
+						</header>
+
+						<SidebarInset>
+							<main className="flex-1">
+								{children}
+							</main>
+						</SidebarInset>
+					</div>
+				</div>
+			</SidebarProvider>
 		</Navbar>
 	);
 }

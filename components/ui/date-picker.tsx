@@ -1,82 +1,68 @@
 "use client"
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
-import { Calendar as CalendarIcon } from 'lucide-react'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
-import { cn } from '@/lib/utils'
+import * as React from "react"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
+import { CalendarIcon } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 interface DatePickerProps {
-    date: Date | undefined
-    setDate: (date: Date | undefined) => void
-    disabled?: boolean
-    placeholder?: string
-    side?: "top" | "right" | "bottom" | "left"
-    align?: "start" | "center" | "end"
-    className?: string
+  date?: Date
+  setDate: (date: Date | undefined) => void
+  placeholder?: string
+  format?: string
+  className?: string
 }
 
-export default function DatePicker({
-                                       date,
-                                       setDate,
-                                       disabled = false,
-                                       placeholder = "Seleccionar fecha",
-                                       side = "bottom",
-                                       align = "start",
-                                       className
-                                   }: DatePickerProps) {
-    const [open, setOpen] = useState(false)
+export function DatePicker({
+  date,
+  setDate,
+  placeholder = "Seleccionar fecha",
+  format: dateFormat = "PPP",
+  className,
+}: DatePickerProps) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant={"outline"}
+          className={cn(
+            "w-full justify-start text-left font-normal",
+            !date && "text-muted-foreground",
+            className
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? format(date, dateFormat, { locale: es }) : <span>{placeholder}</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={(selectedDate) => {
+            if (selectedDate instanceof Date) {
+              setDate(selectedDate)
+            }
+          }}
+          locale={es}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  )
+}
 
-    return (
-        <div className={cn("relative", className)}>
-            <Popover open={disabled ? false : open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                    <Button
-                        variant="outline"
-                        className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !date && "text-muted-foreground",
-                            disabled && "opacity-50 cursor-not-allowed"
-                        )}
-                        disabled={disabled}
-                        type="button"
-                    >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP", { locale: es }) : placeholder}
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                    className="w-auto p-0"
-                    align={align}
-                    side={side}
-                    sideOffset={4}
-                >
-                    <Calendar
-  mode="single"
-  selected={date}
-  onSelect={(selected) => {
-    if (!selected) {
-      setDate(undefined);
-    } else if (selected instanceof Date) {
-      setDate(selected);
-    } else if (Array.isArray(selected)) {
-      // En modo "single" normalmente no se espera un array, pero lo manejamos para seguridad.
-      setDate(selected[0] || undefined);
-    } else if (typeof selected === "object" && "from" in selected) {
-      // Si es un objeto con from/to, usamos 'from'
-      setDate(selected.from);
-    } else {
-      setDate(undefined);
-    }
-  }}
-  initialFocus
-  showOutsideDays
-/>
-                </PopoverContent>
-            </Popover>
-        </div>
-    )
+// Componente de demostración mantenido por compatibilidad
+export function DatePickerDemo() {
+  const [date, setDate] = React.useState<Date>()
+  return <DatePicker date={date} setDate={setDate} placeholder="Seleccionar fecha" />
 }

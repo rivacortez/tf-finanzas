@@ -1,7 +1,7 @@
 export const routesConfig = {
     public: {
       home: {
-        path: '/home'
+        path: '/dashboard'
       },
       signIn: {
         path: '/sign-in'
