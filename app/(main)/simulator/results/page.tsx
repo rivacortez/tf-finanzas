@@ -46,31 +46,8 @@ type Indicators = {
 export default function ResultsPage() {
   const searchParams = useSearchParams();
   const [bondParams, setBondParams] = useState<BondParams | null>(null);
-  const [ setSchedule] = useState<PaymentRow[]>([]);
-  const [ setIndicators] = useState<Indicators | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [ setActiveTab] = useState("schedule");
-
-  // Efecto para manejar el hash de la URL y cambiar la pestaña activa
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '');
-      if (hash && ["schedule", "indicators", "compliance"].includes(hash)) {
-        setActiveTab(hash);
-      }
-    };
-
-    // Revisar el hash inicial
-    handleHashChange();
-
-    // Escuchar cambios en el hash
-    window.addEventListener('hashchange', handleHashChange);
-    
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, []);
 
   useEffect(() => {
     try {
@@ -85,19 +62,6 @@ export default function ResultsPage() {
       
       // Simular una llamada a la API para calcular el cronograma
       setTimeout(() => {
-        // Generar un cronograma de pagos de prueba
-        const mockedSchedule = generateMockSchedule(decodedParams);
-        setSchedule(mockedSchedule);
-        
-        // Generar indicadores financieros de prueba
-        setIndicators({
-          tcea: 14.25,
-          trea: 12.75,
-          duration: 1.85,
-          modifiedDuration: 1.72,
-          convexity: 4.35
-        });
-        
         setLoading(false);
       }, 1000);
       
@@ -107,51 +71,6 @@ export default function ResultsPage() {
       setLoading(false);
     }
   }, [searchParams]);
-
-  // Función para generar un cronograma de pagos de prueba
-  function generateMockSchedule(params: BondParams): PaymentRow[] {
-    const { amount, term, rateValue, insurance, commission } = params;
-    const rows: PaymentRow[] = [];
-    
-    // Calcular una cuota aproximada (para propósitos de demostración)
-    const monthlyRate = rateValue / 100 / 12;
-    const payment = amount * (monthlyRate * Math.pow(1 + monthlyRate, term)) / (Math.pow(1 + monthlyRate, term) - 1);
-    
-    let balance = amount;
-    let startDate = new Date(params.startDate);
-    
-    for (let i = 1; i <= term; i++) {
-      const interest = balance * monthlyRate;
-      let principal = payment - interest;
-      
-      // Ajustar para el último pago
-      if (i === term) {
-        principal = balance;
-      }
-      
-      const insuranceAmount = insurance ? balance * 0.0005 : 0; // 0.05%
-      const commissionAmount = commission ? 9 : 0; // S/ 9.00 por cuota
-      
-      const paymentDate = new Date(startDate);
-      paymentDate.setMonth(paymentDate.getMonth() + i);
-      
-      balance -= principal;
-      if (balance < 0.01) balance = 0; // Evitar errores de redondeo
-      
-      rows.push({
-        number: i,
-        date: paymentDate.toLocaleDateString("es-PE"),
-        principal: Number(principal.toFixed(2)),
-        interest: Number(interest.toFixed(2)),
-        insurance: Number(insuranceAmount.toFixed(2)),
-        commission: commissionAmount,
-        total: Number((principal + interest + insuranceAmount + commissionAmount).toFixed(2)),
-        balance: Number(balance.toFixed(2))
-      });
-    }
-    
-    return rows;
-  }
 
   // Si está cargando
   if (loading) {

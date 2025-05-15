@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { ModeToggle } from "@/components/ui/mode-toggle"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, Package, Grid3X3, Settings, Users, FileText, Bell, ChevronRight, Home, Calculator, BookOpen } from "lucide-react"
+import { Menu, Package, Users, FileText, Bell, Home, Calculator, BookOpen } from "lucide-react"
 import { UserProfileMenu } from "@/components/ui/user-profile-menu"
 
 export function Navbar({ children }: { children?: React.ReactNode }) {
