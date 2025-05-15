@@ -105,6 +105,9 @@ export default function BondForm() {
   const watchRateType = form.watch("rateType");
   const watchGraceType = form.watch("graceType");
 
+  // Justo antes del render, fuerza el tipo:
+  const graceTypeValue = watchGraceType as FormValues['graceType'];
+
   return (
     <div className="bg-white dark:bg-neutral-800 rounded-lg shadow p-6">
       <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Datos del Bono Educativo</h2>
@@ -285,7 +288,7 @@ export default function BondForm() {
               )}
             />
             
-            {watchGraceType !== "none" && (
+            {String(graceTypeValue) !== "none" && (
               <FormField
                 control={form.control}
                 name="gracePeriod"
@@ -297,7 +300,7 @@ export default function BondForm() {
                         type="number" 
                         placeholder="0" 
                         {...field} 
-                        disabled={watchGraceType === "none"}
+                        disabled={String(graceTypeValue) === "none"}
                       />
                     </FormControl>
                     <FormMessage />
