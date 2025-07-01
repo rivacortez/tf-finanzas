@@ -89,7 +89,7 @@ export default function ResultsPage() {
           Resultados de la Simulación
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          A continuación se muestra el cronograma de pagos y los indicadores financieros para tu bono educativo.
+          A continuación se muestra el cronograma de pagos y los indicadores financieros para tu bono .
         </p>
       </div>
 

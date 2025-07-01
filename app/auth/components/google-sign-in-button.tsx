@@ -16,7 +16,8 @@ export function GoogleSignInButton() {
           queryParams: {
             access_type: 'offline',
             prompt: 'consent'
-          }
+          },
+          scopes: 'openid email profile'
         },
       });
 
@@ -32,7 +33,7 @@ export function GoogleSignInButton() {
     <Button
       variant="outline"
       type="button"
-      className="w-full"
+      className="w-full h-11 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-900 dark:text-slate-100 font-medium transition-all duration-200"
       onClick={signInWithGoogle}
     >
       <FcGoogle className="h-5 w-5 mr-2" />

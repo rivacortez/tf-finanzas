@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/app/context/AuthContext";
-import { useUserProfile } from "@/hooks/use-user-profile";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Navbar } from "@/components/ui/navbar";
 import { User, Mail, Phone, MapPin, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "../context/AuthContext";
+import { useUserProfile } from "@/hooks/use-user-profile";
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();

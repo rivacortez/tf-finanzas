@@ -1,5 +1,5 @@
 export interface ValoracionBono {
-  id: string;
+  id_valoracion: string;
   trea: number;
   tcea: number;
   duracion: number;

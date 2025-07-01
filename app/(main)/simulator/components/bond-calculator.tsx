@@ -74,7 +74,7 @@ export default function BondCalculator({ bondParams }: BondCalculatorProps) {
       {/* Resumen del bono */}
       <Card className="bg-primary/5 border-primary/20">
         <CardHeader className="pb-3">
-          <CardTitle>Resumen del Bono Educativo</CardTitle>
+          <CardTitle>Resumen del Bono </CardTitle>
           <CardDescription>
             Parámetros configurados para la simulación
           </CardDescription>

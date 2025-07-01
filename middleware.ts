@@ -1,13 +1,14 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from './utils/supabase/middleware'
 import { createServerClient } from '@supabase/ssr'
+import { Database } from '@/app/core/interfaces/Database'
 
 export async function middleware(request: NextRequest) {
   // Get the response from updateSession which handles cookies
   const response = await updateSession(request)
   
   // Create a Supabase client to check authentication status
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

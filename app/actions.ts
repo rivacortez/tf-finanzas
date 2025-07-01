@@ -6,31 +6,67 @@ import { redirect, RedirectType } from "next/navigation";
 import { routesConfig } from "@/lib/config/routes";
 
 export const signUpAction = async (formData: FormData) => {
+  console.log('🚀 SignUp action started');
+  
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
+  const firstName = formData.get("first_name")?.toString();
+  const lastName = formData.get("last_name")?.toString();
+  
+  console.log('📝 Form data:', { email, firstName, lastName, passwordLength: password?.length });
+  
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
+  console.log('🌐 Origin:', origin);
+
   if (!email || !password) {
-    redirect(`/sign-up?type=error&message=${encodeURIComponent("Email and password are required")}`);
+    console.log('❌ Missing email or password');
+    redirect(`/sign-up?type=error&message=${encodeURIComponent("Email y contraseña son requeridos")}`);
   }
 
-  const { error } = await supabase.auth.signUp({
+  if (password.length < 8) {
+    console.log('❌ Password too short');
+    redirect(`/sign-up?type=error&message=${encodeURIComponent("La contraseña debe tener al menos 8 caracteres")}`);
+  }
+
+  console.log('🔄 Attempting signup with Supabase...');
+
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: `${origin}/auth/callback`,
+      data: {
+        first_name: firstName || '',
+        last_name: lastName || '',
+        username: email.split('@')[0],
+      }
     },
   });
 
+  console.log('📊 Supabase response:', { data: data?.user?.id, error: error?.message });
+
   if (error) {
-    console.error(`${error.code} ${error.message}`);
-    redirect(`/sign-up?type=error&message=${encodeURIComponent(error.message)}`);
+    console.error(`❌ Signup error: ${error.code} ${error.message}`);
+    let errorMessage = "Error al crear la cuenta";
+    
+    if (error.message.includes('already registered')) {
+      errorMessage = "Este email ya está registrado";
+    } else if (error.message.includes('invalid email')) {
+      errorMessage = "Email inválido";
+    } else if (error.message.includes('weak password')) {
+      errorMessage = "La contraseña es muy débil";
+    } else if (error.message.includes('signup')) {
+      errorMessage = "Error en el registro. Verifica tu configuración.";
+    }
+    
+    console.log('🔄 Redirecting to signup with error:', errorMessage);
+    redirect(`/sign-up?type=error&message=${encodeURIComponent(errorMessage)}`);
   }
   
-  redirect(`/sign-up?type=success&message=${encodeURIComponent("Thanks for signing up! Please check your email for a verification link.")}`);
-
-
+  console.log('✅ Signup successful, redirecting...');
+  redirect(`/sign-up?type=success&message=${encodeURIComponent("¡Registro exitoso! Revisa tu email para verificar tu cuenta.")}`);
 };
 
 export const signInAction = async (formData: FormData) => {
@@ -38,25 +74,8 @@ export const signInAction = async (formData: FormData) => {
   const password = formData.get("password") as string;
   const supabase = await createClient();
 
-  // First, check if this email is already associated with a Google account
-  const { data: usersByEmail } = await supabase
-    .from('auth.users')
-    .select('id, identities')
-    .eq('email', email)
-    .single();
-
-  // If user exists and has a Google identity, suggest using Google sign-in instead
-  if (usersByEmail && usersByEmail.identities) {
-    const identities = JSON.parse(usersByEmail.identities);
-    interface UserIdentity {
-      provider: string;
-      [key: string]: unknown;
-    }
-    const hasGoogleIdentity = identities.some((identity: UserIdentity) => identity.provider === 'google');
-    
-    if (hasGoogleIdentity) {
-      redirect(`/sign-in?type=info&message=${encodeURIComponent("Esta cuenta está vinculada a Google. Por favor, utiliza el botón 'Continuar con Google' para iniciar sesión.")}`)
-    }
+  if (!email || !password) {
+    redirect(`/sign-in?type=error&message=${encodeURIComponent("Email y contraseña son requeridos")}`);
   }
 
   // Proceed with normal email/password authentication
@@ -66,7 +85,18 @@ export const signInAction = async (formData: FormData) => {
   });
 
   if (error) {
-    redirect(`/sign-in?type=error&message=${encodeURIComponent(error.message)}`);
+    console.error('Sign in error:', error);
+    let errorMessage = "Error al iniciar sesión";
+    
+    if (error.message.includes('Invalid login credentials')) {
+      errorMessage = "Credenciales incorrectas. Verifica tu email y contraseña.";
+    } else if (error.message.includes('Email not confirmed')) {
+      errorMessage = "Confirma tu email antes de iniciar sesión.";
+    } else if (error.message.includes('Too many requests')) {
+      errorMessage = "Demasiados intentos. Intenta más tarde.";
+    }
+    
+    redirect(`/sign-in?type=error&message=${encodeURIComponent(errorMessage)}`);
   }
 
   redirect(routesConfig.public.home.path, RedirectType.push);

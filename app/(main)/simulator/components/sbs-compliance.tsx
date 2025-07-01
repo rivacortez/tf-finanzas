@@ -216,7 +216,7 @@ export default function SbsCompliance({ bondParams }: SbsComplianceProps) {
                   <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-500" />
                   <AlertTitle>Cumple con la normativa</AlertTitle>
                   <AlertDescription>
-                    La configuración del bono educativo cumple con todas las regulaciones de la SBS.
+                    La configuración del bono  cumple con todas las regulaciones de la SBS.
                   </AlertDescription>
                 </>
               )}
@@ -226,7 +226,7 @@ export default function SbsCompliance({ bondParams }: SbsComplianceProps) {
                   <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
                   <AlertTitle>Cumplimiento parcial</AlertTitle>
                   <AlertDescription>
-                    La configuración del bono educativo cumple parcialmente con las regulaciones de la SBS. 
+                    La configuración del bono  cumple parcialmente con las regulaciones de la SBS. 
                     Revise los detalles para correcciones necesarias.
                   </AlertDescription>
                 </>
@@ -237,7 +237,7 @@ export default function SbsCompliance({ bondParams }: SbsComplianceProps) {
                   <XCircle className="h-4 w-4 text-red-600 dark:text-red-500" />
                   <AlertTitle>No cumple con la normativa</AlertTitle>
                   <AlertDescription>
-                    La configuración del bono educativo no cumple con importantes regulaciones de la SBS. 
+                    La configuración del bono  no cumple con importantes regulaciones de la SBS. 
                     Es necesario ajustar los parámetros para cumplir con la normativa.
                   </AlertDescription>
                 </>

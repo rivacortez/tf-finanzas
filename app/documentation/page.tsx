@@ -9,8 +9,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const metadata: Metadata = {
-  title: "EduBono | Documentación",
-  description: "Información sobre el método francés y bonos educativos",
+  title: "CorpoBonds  | Documentación",
+  description: "Información sobre el método francés y bonos",
 };
 
 export default function DocumentationPage() {
@@ -21,7 +21,7 @@ export default function DocumentationPage() {
           Documentación
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Información técnica sobre el sistema de bonos educativos, método francés y normativas aplicables.
+          Información técnica sobre el sistema de bonos, método francés y normativas aplicables.
         </p>
       </div>
 
@@ -106,7 +106,7 @@ export default function DocumentationPage() {
             <CardHeader>
               <CardTitle>Normativa SBS aplicable</CardTitle>
               <CardDescription>
-                Resoluciones y circulares que regulan los bonos educativos
+                Resoluciones y circulares que regulan los bonos
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -156,7 +156,7 @@ export default function DocumentationPage() {
             <CardHeader>
               <CardTitle>Indicadores Financieros</CardTitle>
               <CardDescription>
-                Métricas utilizadas para evaluar bonos educativos
+                Métricas utilizadas para evaluar bonos
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -216,7 +216,7 @@ export default function DocumentationPage() {
             <CardHeader>
               <CardTitle>Glosario de términos financieros</CardTitle>
               <CardDescription>
-                Conceptos clave relacionados con bonos educativos
+                Conceptos clave relacionados con bonos
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -225,7 +225,7 @@ export default function DocumentationPage() {
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Términos generales</h3>
                   <dl className="space-y-4">
                     <div>
-                      <dt className="font-medium text-gray-900 dark:text-white">Bono educativo</dt>
+                      <dt className="font-medium text-gray-900 dark:text-white">Bono</dt>
                       <dd className="text-gray-600 dark:text-gray-400 mt-1">
                         Instrumento de deuda emitido para financiar estudios académicos.
                       </dd>

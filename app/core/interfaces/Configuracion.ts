@@ -1,5 +1,5 @@
 export interface Configuracion {
-  id: string;
+  id_configuracion: string;
   moneda: string;
   tipo_tasa: string;
   capitalizacion: string;

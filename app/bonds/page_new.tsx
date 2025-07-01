@@ -1,12 +1,12 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye, Plus } from "lucide-react";
 import { Navbar } from "@/components/ui/navbar";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "TF Finanzas | Mis Bonos",

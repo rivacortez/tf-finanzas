@@ -161,7 +161,7 @@ export default function PaymentSchedule({ schedule, currency }: PaymentScheduleP
         </h3>
         <ul className="text-xs text-amber-700 dark:text-amber-400 space-y-1 list-disc pl-4">
           <li>
-            Este cronograma es referencial y podría variar según las condiciones específicas de tu bono educativo.
+            Este cronograma es referencial y podría variar según las condiciones específicas de tu bono .
           </li>
           <li>
             La TCEA (Tasa de Costo Efectivo Anual) incluye todos los costos asociados: intereses, seguros y comisiones.
@@ -170,7 +170,7 @@ export default function PaymentSchedule({ schedule, currency }: PaymentScheduleP
             Las fechas de pago pueden variar según los días hábiles bancarios.
           </li>
           <li>
-            Consulta los términos y condiciones completos antes de firmar tu contrato de bono educativo.
+            Consulta los términos y condiciones completos antes de firmar tu contrato de bono .
           </li>
         </ul>
       </div>

@@ -1,6 +1,6 @@
 export interface Pago {
-  id: string;
-  fecha_pago: string;
+  id_pago: string;
+  fecha_pago: Date;
   monto_pago: number;
   tipo_pago: string;
   bono_id: string;

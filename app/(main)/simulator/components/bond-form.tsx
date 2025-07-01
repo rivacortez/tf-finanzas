@@ -110,7 +110,7 @@ export default function BondForm() {
 
   return (
     <div className="bg-white dark:bg-neutral-800 rounded-lg shadow p-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Datos del Bono Educativo</h2>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Datos del Bono </h2>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
