@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [loading, setLoading] = useState(true);
 	const supabase = createClient();
 
-	const fetchProfile = async (userId: string) => {
+	const fetchProfile = useCallback(async (userId: string) => {
 		try {
 			console.log("Fetching profile for user:", userId);
 			
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			console.error("Error fetching profile:", error);
 			return null;
 		}
-	};
+	}, [supabase]);
 
 	const refreshUser = useCallback(async () => {
 		try {
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		} finally {
 			setLoading(false);
 		}
-	}, [supabase]);
+	}, [supabase, fetchProfile]);
 
 	useEffect(() => {
 		refreshUser();
@@ -120,7 +120,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		return () => {
 			authListener?.subscription.unsubscribe();
 		};
-	}, [refreshUser]);
+	}, [refreshUser, fetchProfile, supabase.auth]);
 
 	return (
 		<AuthContext.Provider value={{ user, profile, loading, refreshUser }}>

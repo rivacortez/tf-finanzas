@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,8 @@ type BondParams = {
 };
 
 
-export default function ResultsPage() {
+// Componente que maneja los parámetros de búsqueda
+function ResultsPageContent() {
   const searchParams = useSearchParams();
   const [bondParams, setBondParams] = useState<BondParams | null>(null);
   const [loading, setLoading] = useState(true);
@@ -98,6 +99,14 @@ export default function ResultsPage() {
         <BondCalculator bondParams={{ ...bondParams, startDate: new Date(bondParams.startDate) }} />
       )}
     </div>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto py-8">Cargando resultados...</div>}>
+      <ResultsPageContent />
+    </Suspense>
   );
 }
 

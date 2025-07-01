@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/client";
-import { Profile, Role, UserRole } from "@/app/auth/interfaces/User";
+import { Profile, Role } from "@/app/auth/interfaces/User";
 
 export class UsersService {
   private supabase = createClient();
@@ -118,7 +118,7 @@ export class UsersService {
         return [];
       }
 
-      return data?.map((item: any) => item.roles as Role).filter(Boolean) || [];
+      return data?.map((item: Record<string, unknown>) => item.roles as Role).filter(Boolean) || [];
     } catch (error) {
       console.error("Error getting user roles:", error);
       return [];
@@ -184,7 +184,7 @@ export class UsersService {
       }
 
       return !!data;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
