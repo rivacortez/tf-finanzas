@@ -13,6 +13,7 @@ export default async function Signup(props: { searchParams: Promise<Message> }) 
   const searchParams = await props.searchParams;
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
         
@@ -22,6 +23,40 @@ export default async function Signup(props: { searchParams: Promise<Message> }) 
             <div className="flex items-center space-x-3">
               <div className="h-12 w-12 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
                 <TrendingUp className="h-6 w-6 text-white" />
+=======
+      <div className="flex min-h-screen bg-white text-gray-900 dark:bg-neutral-900 dark:text-gray-100">
+        <div className="hidden lg:flex lg:w-1/2 bg-primary/5 dark:bg-primary/10 items-center justify-center p-12">
+          <div className="max-w-md text-center">
+            <div className="mb-6 flex justify-center">
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-16 w-16 text-primary"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+              >
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+            <h2 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-gray-100">
+              Crea tu cuenta
+            </h2>
+            
+          </div>
+        </div>
+
+        <div className="flex w-full items-center justify-center px-6 py-12 lg:w-1/2">
+          <div className="w-full max-w-md">
+            <div className="mb-8">
+              <div className="mb-6 flex justify-center lg:justify-start">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary">
+                </div>
+>>>>>>> 5a6301ab6b123d35293a4806b95c620ac1b2f2cf
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white">TF Finanzas</h1>
