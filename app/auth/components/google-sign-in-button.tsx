@@ -9,10 +9,16 @@ export function GoogleSignInButton() {
 
   const signInWithGoogle = async () => {
     try {
+      // Determine the correct redirect URL based on the current environment
+      const isProduction = window.location.hostname !== 'localhost';
+      const baseUrl = isProduction 
+        ? 'https://tu-app-vercel.vercel.app' // Reemplaza con tu URL de Vercel
+        : window.location.origin;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${baseUrl}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent'
