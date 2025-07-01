@@ -61,13 +61,6 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                 </div>
               </div>
             </div>
-<<<<<<< HEAD
-=======
-            <h2 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-gray-100">
-              Accede a tu cuenta
-            </h2>
-           
->>>>>>> 5a6301ab6b123d35293a4806b95c620ac1b2f2cf
           </div>
         </div>
 
