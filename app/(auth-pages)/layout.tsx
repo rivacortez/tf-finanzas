@@ -8,7 +8,7 @@ export default async function Layout({
 	return (
 		<>
 			<AppNavbarAuth />
-			<main className="w-full p-1">
+			<main className="w-full ">
 				{children}
 			</main>
 		</>
