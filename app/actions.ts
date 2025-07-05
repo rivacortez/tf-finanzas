@@ -8,17 +8,11 @@ import { routesConfig } from "@/lib/config/routes";
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
-  const firstName = formData.get("first_name")?.toString();
-  const lastName = formData.get("last_name")?.toString();
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
   if (!email || !password) {
-    redirect(`/sign-up?type=error&message=${encodeURIComponent("Email y contraseña son requeridos")}`);
-  }
-
-  if (password.length < 8) {
-    redirect(`/sign-up?type=error&message=${encodeURIComponent("La contraseña debe tener al menos 8 caracteres")}`);
+    redirect(`/sign-up?type=error&message=${encodeURIComponent("Email and password are required")}`);
   }
 
   const { error } = await supabase.auth.signUp({
@@ -26,30 +20,17 @@ export const signUpAction = async (formData: FormData) => {
     password,
     options: {
       emailRedirectTo: `${origin}/auth/callback`,
-      data: {
-        first_name: firstName || '',
-        last_name: lastName || '',
-        username: email.split('@')[0],
-      }
     },
   });
 
   if (error) {
     console.error(`${error.code} ${error.message}`);
-    let errorMessage = "Error al crear la cuenta";
-    
-    if (error.message.includes('already registered')) {
-      errorMessage = "Este email ya está registrado";
-    } else if (error.message.includes('invalid email')) {
-      errorMessage = "Email inválido";
-    } else if (error.message.includes('weak password')) {
-      errorMessage = "La contraseña es muy débil";
-    }
-    
-    redirect(`/sign-up?type=error&message=${encodeURIComponent(errorMessage)}`);
+    redirect(`/sign-up?type=error&message=${encodeURIComponent(error.message)}`);
   }
   
-  redirect(`/sign-up?type=success&message=${encodeURIComponent("¡Registro exitoso! Revisa tu email para verificar tu cuenta.")}`);
+  redirect(`/sign-up?type=success&message=${encodeURIComponent("Thanks for signing up! Please check your email for a verification link.")}`);
+
+
 };
 
 export const signInAction = async (formData: FormData) => {
@@ -68,18 +49,7 @@ export const signInAction = async (formData: FormData) => {
   });
 
   if (error) {
-    console.error('Sign in error:', error);
-    let errorMessage = "Error al iniciar sesión";
-    
-    if (error.message.includes('Invalid login credentials')) {
-      errorMessage = "Credenciales incorrectas. Verifica tu email y contraseña.";
-    } else if (error.message.includes('Email not confirmed')) {
-      errorMessage = "Confirma tu email antes de iniciar sesión.";
-    } else if (error.message.includes('Too many requests')) {
-      errorMessage = "Demasiados intentos. Intenta más tarde.";
-    }
-    
-    redirect(`/sign-in?type=error&message=${encodeURIComponent(errorMessage)}`);
+    redirect(`/sign-in?type=error&message=${encodeURIComponent(error.message)}`);
   }
 
   redirect(routesConfig.public.home.path, RedirectType.push);
