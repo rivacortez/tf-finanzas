@@ -6,33 +6,22 @@ import { redirect, RedirectType } from "next/navigation";
 import { routesConfig } from "@/lib/config/routes";
 
 export const signUpAction = async (formData: FormData) => {
-  console.log('🚀 SignUp action started');
-  
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const firstName = formData.get("first_name")?.toString();
   const lastName = formData.get("last_name")?.toString();
-  
-  console.log('📝 Form data:', { email, firstName, lastName, passwordLength: password?.length });
-  
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
-  console.log('🌐 Origin:', origin);
-
   if (!email || !password) {
-    console.log('❌ Missing email or password');
     redirect(`/sign-up?type=error&message=${encodeURIComponent("Email y contraseña son requeridos")}`);
   }
 
   if (password.length < 8) {
-    console.log('❌ Password too short');
     redirect(`/sign-up?type=error&message=${encodeURIComponent("La contraseña debe tener al menos 8 caracteres")}`);
   }
 
-  console.log('🔄 Attempting signup with Supabase...');
-
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -45,10 +34,8 @@ export const signUpAction = async (formData: FormData) => {
     },
   });
 
-  console.log('📊 Supabase response:', { data: data?.user?.id, error: error?.message });
-
   if (error) {
-    console.error(`❌ Signup error: ${error.code} ${error.message}`);
+    console.error(`${error.code} ${error.message}`);
     let errorMessage = "Error al crear la cuenta";
     
     if (error.message.includes('already registered')) {
@@ -57,15 +44,11 @@ export const signUpAction = async (formData: FormData) => {
       errorMessage = "Email inválido";
     } else if (error.message.includes('weak password')) {
       errorMessage = "La contraseña es muy débil";
-    } else if (error.message.includes('signup')) {
-      errorMessage = "Error en el registro. Verifica tu configuración.";
     }
     
-    console.log('🔄 Redirecting to signup with error:', errorMessage);
     redirect(`/sign-up?type=error&message=${encodeURIComponent(errorMessage)}`);
   }
   
-  console.log('✅ Signup successful, redirecting...');
   redirect(`/sign-up?type=success&message=${encodeURIComponent("¡Registro exitoso! Revisa tu email para verificar tu cuenta.")}`);
 };
 

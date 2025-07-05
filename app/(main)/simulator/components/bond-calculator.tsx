@@ -28,17 +28,24 @@ export default function BondCalculator({ bondParams }: BondCalculatorProps) {
 
   useEffect(() => {
     try {
-      // Simular un pequeño retraso para mostrar el estado de carga
+      // Log de entrada de parámetros
+      // eslint-disable-next-line no-console
+      console.log("[BondCalculator] Parámetros recibidos:", bondParams);
       setLoading(true);
-      
       setTimeout(() => {
-        // Realizar el cálculo utilizando las funciones de bond-calculator
+        // Log antes del cálculo
+        // eslint-disable-next-line no-console
+        console.log("[BondCalculator] Iniciando cálculo de cronograma...");
         const result = generatePaymentSchedule(bondParams);
+        // Log después del cálculo
+        // eslint-disable-next-line no-console
+        console.log("[BondCalculator] Resultado del cálculo:", result);
         setCalculationResult(result);
         setLoading(false);
       }, 1000);
     } catch (err) {
-      console.error("Error al calcular el cronograma:", err);
+      // eslint-disable-next-line no-console
+      console.error("[BondCalculator] Error al calcular el cronograma:", err);
       setError("Ocurrió un error al calcular el cronograma de pagos. Por favor, verifica los parámetros e intenta nuevamente.");
       setLoading(false);
     }

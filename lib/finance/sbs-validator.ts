@@ -1,5 +1,5 @@
 /**
- * Utilidades para validación de normativa SBS en bonos educativos
+ * Utilidades para validación de normativa SBS en bonos
  */
 
 import { BondParams } from "./bond-calculator";

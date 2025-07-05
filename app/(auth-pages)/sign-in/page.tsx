@@ -24,8 +24,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">TF Finanzas</h1>
-                <p className="text-slate-600 dark:text-slate-400">Gestión inteligente de bonos</p>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Sistema de Gestión de Bonos</h1>
               </div>
             </div>
           </div>
@@ -46,8 +45,6 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                   <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-white">Seguimiento en tiempo real</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Monitorea el rendimiento de tus bonos</p>
                 </div>
               </div>
               

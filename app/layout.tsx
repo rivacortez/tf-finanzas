@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "TF Finanzas - Sistema de Gestión de Bonos",
+  title: "Sistema de Gestión de Bonos",
   description: "Plataforma para simulación y gestión de bonos financieros",
 };
 

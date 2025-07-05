@@ -18,7 +18,7 @@ export default function AppNavbarAuth() {
             <div className="w-full max-w-7xl mx-auto flex items-center justify-between p-4 text-sm">
                 <div className="flex items-center">
                     <Link href={"/"} className="flex items-center gap-2 text-xl font-bold text-primary hover:text-primary/90 transition-colors">
-                        <span>Finanzas </span>
+                        <span>BonoCorp </span>
                     </Link>
                 </div>
 

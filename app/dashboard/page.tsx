@@ -6,12 +6,10 @@ import { CalendarDays, Calculator, File, TrendingUp, Book, PlusCircle } from "lu
 import { Navbar } from "@/components/ui/navbar";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { Bono } from "@/app/core/interfaces/Bono";
-
 
 export const metadata: Metadata = {
-  title: "TF Finanzas | Dashboard",
-  description: "Panel principal de TF Finanzas para la gestión de bonos",
+  title: " Finanzas | Dashboard",
+  description: "Panel principal de  Finanzas para la gestión de bonos",
 };
 
 export default async function DashboardPage() {
@@ -24,7 +22,8 @@ export default async function DashboardPage() {
   }
 
   // Por ahora, no consultamos la base de datos hasta que se configuren las políticas RLS
-  const bonos: Bono[] = [];
+  const profile = null;
+  const bonos = null;
   const bonosCount = 0;
 
   return (

@@ -24,7 +24,7 @@ export default async function Signup(props: { searchParams: Promise<Message> }) 
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">TF Finanzas</h1>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">BonoCorp</h1>
                 <p className="text-slate-600 dark:text-slate-400">Gestión inteligente de bonos</p>
               </div>
             </div>
@@ -33,7 +33,7 @@ export default async function Signup(props: { searchParams: Promise<Message> }) 
           <div className="space-y-6">
             <div className="space-y-4">
               <h2 className="text-3xl font-bold text-slate-900 dark:text-white leading-tight">
-                Únete a TF Finanzas
+                Únete a BonoCorp
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-400">
                 Crea tu cuenta y comienza a gestionar tus inversiones en bonos de manera profesional.

@@ -1,5 +1,5 @@
 /**
- * Utilidades para el cálculo de bonos educativos usando el método francés
+ * Utilidades para el cálculo de bonos  usando el método francés
  */
 
 // Tipos para los parámetros del bono

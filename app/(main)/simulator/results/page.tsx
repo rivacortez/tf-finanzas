@@ -4,24 +4,8 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-
 import BondCalculator from "../components/bond-calculator";
-
-// Tipo para los parámetros del bono
-type BondParams = {
-  amount: number;
-  currency: string;
-  term: number;
-  rateType: string;
-  rateValue: number;
-  capitalization?: string;
-  gracePeriod: number;
-  graceType: string;
-  startDate: string;
-  insurance: boolean;
-  commission: boolean;
-};
-
+import type { BondParams } from "@/lib/finance/bond-calculator";
 
 // Componente que maneja los parámetros de búsqueda
 function ResultsPageContent() {
@@ -37,16 +21,30 @@ function ResultsPageContent() {
       if (!dataParam) {
         throw new Error("No se encontraron datos del bono");
       }
-
-      const decodedParams = JSON.parse(decodeURIComponent(dataParam)) as BondParams;
-      setBondParams(decodedParams);
-      
-      // Simular una llamada a la API para calcular el cronograma
+      const decodedParams = JSON.parse(decodeURIComponent(dataParam));
+      // Validar y convertir startDate
+      let parsedDate: Date = new Date();
+      if (decodedParams.startDate) {
+        const tryDate = new Date(decodedParams.startDate);
+        if (!isNaN(tryDate.getTime())) {
+          parsedDate = tryDate;
+        }
+      }
+      // Eliminar startDate string del objeto original para evitar conflicto de tipos
+      const { startDate, ...restParams } = decodedParams;
+      const params: BondParams = {
+        ...restParams,
+        startDate: parsedDate,
+      };
+      // Log para depuración
+      // eslint-disable-next-line no-console
+      console.log("[Simulador] Parámetros recibidos:", params);
+      setBondParams(params);
       setTimeout(() => {
         setLoading(false);
-      }, 1000);
-      
+      }, 500);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Error al procesar los datos:", err);
       setError("Ocurrió un error al procesar los datos del bono. Por favor, inténtalo de nuevo.");
       setLoading(false);
@@ -83,6 +81,10 @@ function ResultsPageContent() {
     );
   }
 
+  // Mostrar siempre los parámetros recibidos para depuración
+  // eslint-disable-next-line no-console
+  console.log("[Simulador] Renderizando BondCalculator con:", bondParams);
+
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
@@ -90,14 +92,12 @@ function ResultsPageContent() {
           Resultados de la Simulación
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          A continuación se muestra el cronograma de pagos y los indicadores financieros para tu bono .
+          A continuación se muestra el cronograma de pagos y los indicadores financieros para tu bono.
         </p>
       </div>
 
       {/* Calculadora de bonos con método francés */}
-      {bondParams && (
-        <BondCalculator bondParams={{ ...bondParams, startDate: new Date(bondParams.startDate) }} />
-      )}
+      <BondCalculator bondParams={bondParams} />
     </div>
   );
 }
