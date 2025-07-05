@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Navbar } from "@/components/ui/navbar";
-import { User, Mail, Phone, MapPin, Calendar } from "lucide-react";
+import { User, Mail, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
