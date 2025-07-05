@@ -29,12 +29,7 @@ const AuthContext = createContext<AuthContextType>({
   refreshUser: async () => {},
 });
 
-// Proveedor de AuthContext
-enum AuthEvent {
-  SIGNED_IN = "SIGNED_IN",
-  SIGNED_OUT = "SIGNED_OUT",
-  // otros eventos...
-}
+
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
