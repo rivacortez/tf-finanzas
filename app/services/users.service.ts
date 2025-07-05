@@ -119,9 +119,9 @@ export class UsersService {
         return [];
       }
 
-      return data
-        ?.map((item: { roles: Role }) => item.roles)
-        .filter(Boolean) || [];
+      return (
+        data?.flatMap((item: { roles: Role[] }) => item.roles) || []
+      );
     } catch (_error) {
       console.error("Error getting user roles:", _error);
       return [];
