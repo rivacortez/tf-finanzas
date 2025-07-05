@@ -7,7 +7,7 @@ export class UsersService {
 
   // Obtener perfil por ID
   async getProfileById(userId: string): Promise<Profile | null> {
-    try {
+    
       console.log("Fetching profile for user ID:", userId);
 
       const { data, error } = await this.supabase
@@ -33,11 +33,7 @@ export class UsersService {
 
       console.log("Profile found:", data);
       return data;
-    } catch (_error) {
-      console.error("Unexpected error getting profile:", _error);
-      return null;
     }
-  }
 
   // Crear o actualizar perfil
   async upsertProfile(profile: Omit<Profile, "created_at">): Promise<Profile | null> {
