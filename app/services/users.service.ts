@@ -37,7 +37,7 @@ export class UsersService {
 
   // Crear o actualizar perfil
   async upsertProfile(profile: Omit<Profile, "created_at">): Promise<Profile | null> {
-    try {
+   
       const { data, error } = await this.supabase
         .from('profiles')
         .upsert([profile])
@@ -50,15 +50,12 @@ export class UsersService {
       }
 
       return data;
-    } catch (_error) {
-      console.error("Error upserting profile:", _error);
-      return null;
-    }
+   
   }
 
   // Actualizar perfil
   async updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile | null> {
-    try {
+  
       const { data, error } = await this.supabase
         .from('profiles')
         .update(updates)
@@ -72,15 +69,12 @@ export class UsersService {
       }
 
       return data;
-    } catch (_error) {
-      console.error("Error updating profile:", _error);
-      return null;
-    }
+    
   }
 
   // Obtener todos los roles
   async getRoles(): Promise<Role[]> {
-    try {
+   
       const { data, error } = await this.supabase
         .from('roles')
         .select('*');
@@ -91,15 +85,12 @@ export class UsersService {
       }
 
       return data || [];
-    } catch (_error) {
-      console.error("Error getting roles:", _error);
-      return [];
-    }
+   
   }
 
   // Obtener roles de un usuario
   async getUserRoles(userId: string): Promise<Role[]> {
-    try {
+    
       const { data, error } = await this.supabase
         .from('users_roles')
         .select(`
@@ -118,15 +109,13 @@ export class UsersService {
       return (
         data?.flatMap((item: { roles: Role[] }) => item.roles) || []
       );
-    } catch (_error) {
-      console.error("Error getting user roles:", _error);
-      return [];
-    }
+    
+    
   }
 
   // Asignar rol a usuario
   async assignRoleToUser(userId: string, roleId: string): Promise<boolean> {
-    try {
+    
       const { error } = await this.supabase
         .from('users_roles')
         .upsert([{ user_id: userId, role_id: roleId }]);
@@ -137,15 +126,12 @@ export class UsersService {
       }
 
       return true;
-    } catch (_error) {
-      console.error("Error assigning role:", _error);
-      return false;
-    }
+    
   }
 
   // Remover rol de usuario
   async removeRoleFromUser(userId: string, roleId: string): Promise<boolean> {
-    try {
+   
       const { error } = await this.supabase
         .from('users_roles')
         .delete()
@@ -158,15 +144,12 @@ export class UsersService {
       }
 
       return true;
-    } catch (_error) {
-      console.error("Error removing role:", _error);
-      return false;
-    }
+    
   }
 
   // Verificar si un usuario tiene un rol específico
   async userHasRole(userId: string, roleName: string): Promise<boolean> {
-    try {
+  
       const { data, error } = await this.supabase
         .from('users_roles')
         .select(`
@@ -183,23 +166,18 @@ export class UsersService {
       }
 
       return !!data;
-    } catch (_error) {
-      return false;
-    }
+    
   }
 
   // Obtener perfil completo con roles
   async getCompleteProfile(userId: string) {
-    try {
+   
       const [profile, roles] = await Promise.all([
         this.getProfileById(userId),
         this.getUserRoles(userId),
       ]);
 
       return { profile, roles };
-    } catch (_error) {
-      console.error("Error getting complete profile:", _error);
-      return null;
-    }
+    
   }
 }
