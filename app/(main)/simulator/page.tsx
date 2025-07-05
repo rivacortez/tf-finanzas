@@ -46,14 +46,6 @@ const defaultValues: BondFormType = {
   commission: false,
 };
 
-// Utilidad para formatear fecha a YYYY-MM-DD
-const formatDateToYYYYMMDD = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
 const SimulatorPage = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("datos-basicos");
@@ -63,7 +55,7 @@ const SimulatorPage = () => {
     defaultValues,
     mode: "onTouched",
   });
-  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = methods;
+  const { register, handleSubmit, watch, trigger, formState: { errors } } = methods;
 
   const handleNext = async () => {
     let fieldsToValidate: (keyof BondFormType)[] = [];
@@ -74,15 +66,11 @@ const SimulatorPage = () => {
     const valid = await trigger(fieldsToValidate);
     if (!valid) {
       setFormError("Corrige los errores antes de continuar");
-      // eslint-disable-next-line no-console
-      console.warn("[Simulador] Errores de validación en el paso:", activeTab, methods.getValues());
       return;
     }
     setFormError("");
     const idx = tabs.findIndex(t => t.id === activeTab);
     if (idx < tabs.length - 1) {
-      // eslint-disable-next-line no-console
-      console.log("[Simulador] Avanzando de paso:", activeTab, "→", tabs[idx + 1].id, methods.getValues());
       setActiveTab(tabs[idx + 1].id);
     }
   };
@@ -90,16 +78,12 @@ const SimulatorPage = () => {
   const handlePrev = () => {
     const idx = tabs.findIndex(t => t.id === activeTab);
     if (idx > 0) {
-      // eslint-disable-next-line no-console
-      console.log("[Simulador] Retrocediendo de paso:", activeTab, "→", tabs[idx - 1].id, methods.getValues());
       setActiveTab(tabs[idx - 1].id);
     }
   };
 
   const handleClear = () => {
     if (window.confirm("¿Seguro que deseas limpiar el formulario?")) {
-      // eslint-disable-next-line no-console
-      console.log("[Simulador] Formulario limpiado");
       methods.reset(defaultValues);
       setActiveTab("datos-basicos");
       setFormError("");
@@ -107,9 +91,7 @@ const SimulatorPage = () => {
   };
 
   const onSubmit = (data: BondFormType) => {
-    // eslint-disable-next-line no-console
     console.log("[Simulador] Datos enviados al calcular:", data);
-    // Serializar y navegar
     const encodedData = encodeURIComponent(JSON.stringify({
       amount: Number(data.monto),
       currency: data.currency,
@@ -128,13 +110,6 @@ const SimulatorPage = () => {
 
   const rateType = watch("rateType");
   const graceType = watch("graceType");
-
-  // Log en cada cambio de input
-  const watchedValues = watch();
-  useState(() => {
-    // eslint-disable-next-line no-console
-    console.log("[Simulador] Valores actuales del formulario:", watchedValues);
-  });
 
   return (
     <FormProvider {...methods}>
@@ -269,7 +244,6 @@ const SimulatorPage = () => {
                         <DatePicker
                           date={field.value ? new Date(field.value) : undefined}
                           setDate={(date) => {
-                            // Guarda como string YYYY-MM-DD
                             const formatted = date ? date.toISOString().slice(0, 10) : "";
                             field.onChange(formatted);
                           }}

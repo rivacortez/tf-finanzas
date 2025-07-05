@@ -8,11 +8,10 @@ export class UsersService {
   async getProfileById(userId: string): Promise<Profile | null> {
     try {
       console.log("Fetching profile for user ID:", userId);
-
       const { data, error } = await this.supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
         .maybeSingle();
 
       if (error) {
@@ -20,7 +19,7 @@ export class UsersService {
           message: error.message,
           details: error.details,
           code: error.code,
-          hint: error.hint
+          hint: error.hint,
         });
         return null;
       }
@@ -32,8 +31,8 @@ export class UsersService {
 
       console.log("Profile found:", data);
       return data;
-    } catch (error) {
-      console.error("Unexpected error getting profile:", error);
+    } catch (_error) {
+      console.error("Unexpected error getting profile:", _error);
       return null;
     }
   }
@@ -42,7 +41,7 @@ export class UsersService {
   async upsertProfile(profile: Omit<Profile, "created_at">): Promise<Profile | null> {
     try {
       const { data, error } = await this.supabase
-        .from('profiles')
+        .from("profiles")
         .upsert([profile])
         .select()
         .single();
@@ -53,8 +52,8 @@ export class UsersService {
       }
 
       return data;
-    } catch (error) {
-      console.error("Error upserting profile:", error);
+    } catch (_error) {
+      console.error("Error upserting profile:", _error);
       return null;
     }
   }
@@ -63,9 +62,9 @@ export class UsersService {
   async updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile | null> {
     try {
       const { data, error } = await this.supabase
-        .from('profiles')
+        .from("profiles")
         .update(updates)
-        .eq('id', userId)
+        .eq("id", userId)
         .select()
         .single();
 
@@ -75,8 +74,8 @@ export class UsersService {
       }
 
       return data;
-    } catch (error) {
-      console.error("Error updating profile:", error);
+    } catch (_error) {
+      console.error("Error updating profile:", _error);
       return null;
     }
   }
@@ -85,8 +84,8 @@ export class UsersService {
   async getRoles(): Promise<Role[]> {
     try {
       const { data, error } = await this.supabase
-        .from('roles')
-        .select('*');
+        .from("roles")
+        .select("*");
 
       if (error) {
         console.error("Error getting roles:", error);
@@ -94,8 +93,8 @@ export class UsersService {
       }
 
       return data || [];
-    } catch (error) {
-      console.error("Error getting roles:", error);
+    } catch (_error) {
+      console.error("Error getting roles:", _error);
       return [];
     }
   }
@@ -104,30 +103,23 @@ export class UsersService {
   async getUserRoles(userId: string): Promise<Role[]> {
     try {
       const { data, error } = await this.supabase
-        .from('users_roles')
+        .from("users_roles")
         .select(`
           roles (
             id,
             role
           )
         `)
-        .eq('user_id', userId);
+        .eq("user_id", userId);
 
       if (error) {
         console.error("Error getting user roles:", error);
         return [];
       }
 
-      return (
-        data?.flatMap((item: { roles: { id: string; role: string }[] }) =>
-          (item.roles || []).map(role => ({
-            id: role.id,
-            role: role.role
-          }))
-        ) || []
-      );
-    } catch (error) {
-      console.error("Error getting user roles:", error);
+      return data?.map((item: { roles: Role }) => item.roles).filter(Boolean) || [];
+    } catch (_error) {
+      console.error("Error getting user roles:", _error);
       return [];
     }
   }
@@ -136,7 +128,7 @@ export class UsersService {
   async assignRoleToUser(userId: string, roleId: string): Promise<boolean> {
     try {
       const { error } = await this.supabase
-        .from('users_roles')
+        .from("users_roles")
         .upsert([{ user_id: userId, role_id: roleId }]);
 
       if (error) {
@@ -145,8 +137,8 @@ export class UsersService {
       }
 
       return true;
-    } catch (error) {
-      console.error("Error assigning role:", error);
+    } catch (_error) {
+      console.error("Error assigning role:", _error);
       return false;
     }
   }
@@ -155,10 +147,10 @@ export class UsersService {
   async removeRoleFromUser(userId: string, roleId: string): Promise<boolean> {
     try {
       const { error } = await this.supabase
-        .from('users_roles')
+        .from("users_roles")
         .delete()
-        .eq('user_id', userId)
-        .eq('role_id', roleId);
+        .eq("user_id", userId)
+        .eq("role_id", roleId);
 
       if (error) {
         console.error("Error removing role:", error);
@@ -166,8 +158,8 @@ export class UsersService {
       }
 
       return true;
-    } catch (error) {
-      console.error("Error removing role:", error);
+    } catch (_error) {
+      console.error("Error removing role:", _error);
       return false;
     }
   }
@@ -176,14 +168,14 @@ export class UsersService {
   async userHasRole(userId: string, roleName: string): Promise<boolean> {
     try {
       const { data, error } = await this.supabase
-        .from('users_roles')
+        .from("users_roles")
         .select(`
           roles!inner (
             role
           )
         `)
-        .eq('user_id', userId)
-        .eq('roles.role', roleName)
+        .eq("user_id", userId)
+        .eq("roles.role", roleName)
         .single();
 
       if (error) {
@@ -191,7 +183,7 @@ export class UsersService {
       }
 
       return !!data;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -204,13 +196,70 @@ export class UsersService {
         this.getUserRoles(userId)
       ]);
 
-      return {
-        profile,
-        roles
-      };
-    } catch {
-      console.error("Error getting complete profile:");
+      return { profile, roles };
+    } catch (_error) {
+      console.error("Error getting complete profile:", _error);
       return null;
     }
   }
 }
+
+
+/* File: app/context/AuthContext.tsx */
+import React, { createContext, ReactNode, useState, useCallback, useEffect } from "react";
+import { useSupabaseClient, useSessionContext } from "@supabase/auth-helpers-react";
+import { UsersService } from "@/app/services/users.service";
+import { Profile } from "@/app/auth/interfaces/User";
+
+interface AuthContextType {
+  profile: Profile | null;
+  loading: boolean;
+  refreshProfile: () => Promise<void>;
+}
+
+export const AuthContext = createContext<AuthContextType>({
+  profile: null,
+  loading: true,
+  refreshProfile: async () => {}
+});
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const supabaseClient = useSupabaseClient();
+  const { session } = useSessionContext();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchProfile = useCallback(async () => {
+    if (!session?.user?.id) {
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    const usersService = new UsersService();
+    const data = await usersService.getProfileById(session.user.id);
+    setProfile(data);
+    setLoading(false);
+  }, [session?.user?.id]);
+
+  // Fetch profile on mount and session change
+  useEffect(() => {
+    void fetchProfile();
+  }, [fetchProfile]);
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_, _session) => {
+      void fetchProfile();
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabaseClient, fetchProfile]);
+
+  return (
+    <AuthContext.Provider value={{ profile, loading, refreshProfile: fetchProfile }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};

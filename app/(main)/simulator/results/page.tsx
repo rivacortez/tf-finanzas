@@ -37,14 +37,12 @@ function ResultsPageContent() {
         startDate: parsedDate,
       };
       // Log para depuración
-      // eslint-disable-next-line no-console
       console.log("[Simulador] Parámetros recibidos:", params);
       setBondParams(params);
       setTimeout(() => {
         setLoading(false);
       }, 500);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("Error al procesar los datos:", err);
       setError("Ocurrió un error al procesar los datos del bono. Por favor, inténtalo de nuevo.");
       setLoading(false);
@@ -82,7 +80,6 @@ function ResultsPageContent() {
   }
 
   // Mostrar siempre los parámetros recibidos para depuración
-  // eslint-disable-next-line no-console
   console.log("[Simulador] Renderizando BondCalculator con:", bondParams);
 
   return (
