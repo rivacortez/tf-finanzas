@@ -1,12 +1,11 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Calculator, ArrowRight, ArrowLeft, RotateCcw, Sparkles, DollarSign, Calendar, Percent, Clock, Plus, InfoIcon } from "lucide-react";
-
+import ManifestClient from "./manifest-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { Input } from "@/components/ui/input";
@@ -112,7 +111,9 @@ export default function SimulatorPage() {
     additional: "Añade seguros y comisiones opcionales"
   };
   
-	return (
+  return (
+    <>
+    <ManifestClient />
 		<Navbar>
       <div className="container mx-auto py-8">
         {/* Header */}
@@ -675,5 +676,6 @@ export default function SimulatorPage() {
         </div>
       </div>
 		</Navbar>
+    </>
 	);
 }
