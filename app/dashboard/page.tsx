@@ -6,6 +6,7 @@ import { CalendarDays, Calculator, File, TrendingUp, Book, PlusCircle } from "lu
 import { Navbar } from "@/components/ui/navbar";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { Bono } from "@/app/core/interfaces/Bono";
 
 export const metadata: Metadata = {
   title: " Finanzas | Dashboard",
@@ -22,20 +23,20 @@ export default async function DashboardPage() {
   }
 
   // Por ahora, no consultamos la base de datos hasta que se configuren las políticas RLS
-  const bonos: any[] = [];
+  const bonos: Bono[] = [];
   const bonosCount = 0;
 
   return (
     <Navbar>
-      <div className="container mx-auto py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+    <div className="container mx-auto py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Bienvenido, {user.email?.split('@')[0]}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
             Gestiona tus bonos financieros y accede a todas las funcionalidades del sistema
-          </p>
-        </div>
+        </p>
+      </div>
 
         {/* Estadísticas rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -83,7 +84,7 @@ export default async function DashboardPage() {
               </p>
             </CardContent>
           </Card>
-        </div>
+          </div>
 
         {/* Acciones rápidas */}
         <div className="mb-8">
@@ -108,23 +109,23 @@ export default async function DashboardPage() {
                 <CardHeader className="text-center">
                   <Calculator className="h-8 w-8 text-primary mx-auto mb-2" />
                   <CardTitle className="text-lg">Simulador</CardTitle>
-                  <CardDescription>
+            <CardDescription>
                     Simula el comportamiento de bonos
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+            </CardDescription>
+          </CardHeader>
+        </Card>
             </Link>
 
             <Link href="/bonds">
               <Card className="cursor-pointer hover:shadow-md transition-shadow">
                 <CardHeader className="text-center">
                   <File className="h-8 w-8 text-primary mx-auto mb-2" />
-                  <CardTitle className="text-lg">Mis Bonos</CardTitle>
-                  <CardDescription>
+              <CardTitle className="text-lg">Mis Bonos</CardTitle>
+            <CardDescription>
                     Ve todos tus bonos registrados
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+            </CardDescription>
+          </CardHeader>
+        </Card>
             </Link>
 
             <Link href="/documentation">
@@ -132,11 +133,11 @@ export default async function DashboardPage() {
                 <CardHeader className="text-center">
                   <Book className="h-8 w-8 text-primary mx-auto mb-2" />
                   <CardTitle className="text-lg">Documentación</CardTitle>
-                  <CardDescription>
+            <CardDescription>
                     Aprende cómo usar el sistema
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+            </CardDescription>
+          </CardHeader>
+        </Card>
             </Link>
           </div>
         </div>
@@ -168,18 +169,18 @@ export default async function DashboardPage() {
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Tasa:</span>
                         <span className="text-sm font-medium">{bono.tasa_interes}%</span>
-                      </div>
-                      <div className="flex justify-between">
+              </div>
+                <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Plazo:</span>
                         <span className="text-sm font-medium">{bono.plazo} días</span>
-                      </div>
+                </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Emisión:</span>
                         <span className="text-sm font-medium">
                           {new Date(bono.fecha_emision).toLocaleDateString()}
                         </span>
-                      </div>
-                    </div>
+              </div>
+            </div>
                   </CardContent>
                   <CardFooter>
                     <Link href={`/bonds/${bono.id_bono}`} className="w-full">
@@ -210,11 +211,11 @@ export default async function DashboardPage() {
                 <Link href="/simulator">
                   <Button variant="outline">Usar Simulador</Button>
                 </Link>
-              </div>
+        </div>
             </CardContent>
           </Card>
         )}
       </div>
     </Navbar>
   );
-}
+} 

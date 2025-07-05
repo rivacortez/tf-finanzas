@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		} finally {
 			setLoading(false);
 		}
-	}, [supabase]);
+	}, [supabase, fetchProfile]);
 
 	useEffect(() => {
 		refreshUser();
@@ -120,7 +120,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		return () => {
 			authListener?.subscription.unsubscribe();
 		};
-	}, [refreshUser]);
+	}, [refreshUser, fetchProfile, supabase.auth]);
 
 	return (
 		<AuthContext.Provider value={{ user, profile, loading, refreshUser }}>

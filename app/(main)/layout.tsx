@@ -112,8 +112,8 @@ export default function SimulatorPage() {
     additional: "Añade seguros y comisiones opcionales"
   };
   
-  return (
-    <Navbar>
+	return (
+		<Navbar>
       <div className="container mx-auto py-8">
         {/* Header */}
         <div className="mb-8">
@@ -674,6 +674,6 @@ export default function SimulatorPage() {
           </p>
         </div>
       </div>
-    </Navbar>
-  );
+		</Navbar>
+	);
 }
