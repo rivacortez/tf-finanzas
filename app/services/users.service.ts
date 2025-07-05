@@ -145,8 +145,8 @@ export class UsersService {
       }
 
       return true;
-    } catch (error) {
-      console.error("Error assigning role:", error);
+    } catch {
+      console.error("Error assigning role:");
       return false;
     }
   }
@@ -166,8 +166,8 @@ export class UsersService {
       }
 
       return true;
-    } catch (error) {
-      console.error("Error removing role:", error);
+    } catch {
+      console.error("Error removing role:");
       return false;
     }
   }

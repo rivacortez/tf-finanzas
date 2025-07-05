@@ -31,7 +31,7 @@ function ResultsPageContent() {
         }
       }
       // Eliminar startDate string del objeto original para evitar conflicto de tipos
-      const { startDate, ...restParams } = decodedParams;
+      const { startDate: _unused, ...restParams } = decodedParams;
       const params: BondParams = {
         ...restParams,
         startDate: parsedDate,
