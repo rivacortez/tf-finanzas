@@ -1,3 +1,4 @@
+/* File: app/services/users.service.ts */
 import { createClient } from "@/utils/supabase/client";
 import { Profile, Role } from "@/app/auth/interfaces/User";
 
@@ -20,7 +21,7 @@ export class UsersService {
           message: error.message,
           details: error.details,
           code: error.code,
-          hint: error.hint
+          hint: error.hint,
         });
         return null;
       }
@@ -32,8 +33,8 @@ export class UsersService {
 
       console.log("Profile found:", data);
       return data;
-    } catch (error) {
-      console.error("Unexpected error getting profile:", error);
+    } catch (_error) {
+      console.error("Unexpected error getting profile:", _error);
       return null;
     }
   }
@@ -53,8 +54,8 @@ export class UsersService {
       }
 
       return data;
-    } catch (error) {
-      console.error("Error upserting profile:", error);
+    } catch (_error) {
+      console.error("Error upserting profile:", _error);
       return null;
     }
   }
@@ -75,8 +76,8 @@ export class UsersService {
       }
 
       return data;
-    } catch (error) {
-      console.error("Error updating profile:", error);
+    } catch (_error) {
+      console.error("Error updating profile:", _error);
       return null;
     }
   }
@@ -94,8 +95,8 @@ export class UsersService {
       }
 
       return data || [];
-    } catch (error) {
-      console.error("Error getting roles:", error);
+    } catch (_error) {
+      console.error("Error getting roles:", _error);
       return [];
     }
   }
@@ -118,16 +119,11 @@ export class UsersService {
         return [];
       }
 
-      return (
-        data?.flatMap((item: { roles: { id: string; role: string }[] }) =>
-          (item.roles || []).map(role => ({
-            id: role.id,
-            role: role.role
-          }))
-        ) || []
-      );
-    } catch (error) {
-      console.error("Error getting user roles:", error);
+      return data
+        ?.map((item: { roles: Role }) => item.roles)
+        .filter(Boolean) || [];
+    } catch (_error) {
+      console.error("Error getting user roles:", _error);
       return [];
     }
   }
@@ -145,8 +141,8 @@ export class UsersService {
       }
 
       return true;
-    } catch {
-      console.error("Error assigning role:");
+    } catch (_error) {
+      console.error("Error assigning role:", _error);
       return false;
     }
   }
@@ -166,8 +162,8 @@ export class UsersService {
       }
 
       return true;
-    } catch {
-      console.error("Error removing role:");
+    } catch (_error) {
+      console.error("Error removing role:", _error);
       return false;
     }
   }
@@ -191,7 +187,7 @@ export class UsersService {
       }
 
       return !!data;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -201,15 +197,12 @@ export class UsersService {
     try {
       const [profile, roles] = await Promise.all([
         this.getProfileById(userId),
-        this.getUserRoles(userId)
+        this.getUserRoles(userId),
       ]);
 
-      return {
-        profile,
-        roles
-      };
-    } catch {
-      console.error("Error getting complete profile:");
+      return { profile, roles };
+    } catch (_error) {
+      console.error("Error getting complete profile:", _error);
       return null;
     }
   }
