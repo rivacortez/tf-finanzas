@@ -22,8 +22,7 @@ export default async function DashboardPage() {
   }
 
   // Por ahora, no consultamos la base de datos hasta que se configuren las políticas RLS
-  const profile = null;
-  const bonos = null;
+  const bonos: any[] = [];
   const bonosCount = 0;
 
   return (
