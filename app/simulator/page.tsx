@@ -378,10 +378,10 @@ const SimulatorPage = () => {
                       <Controller
                         control={control}
                         name="gracePeriod"
-                        rules={graceType && graceType !== "none" ? {
-                          required: "El período de gracia es requerido",
-                          validate: (v) => !isNaN(Number(v)) && Number(v) >= 0 || "El período de gracia debe ser 0 o mayor"
-                        } : {}}
+                        rules={graceType ? {
+                            required: "El período de gracia es requerido",
+                            validate: (v) => !isNaN(Number(v)) && Number(v) >= 0 || "El período de gracia debe ser 0 o mayor"
+                          } : {}}
                         render={({ field }) => (
                           <div className="space-y-3">
                             <label className="block text-sm font-semibold text-gray-900 dark:text-white">Duración del Período de Gracia (meses)</label>
