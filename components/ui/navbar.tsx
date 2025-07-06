@@ -22,7 +22,7 @@ export function Navbar({ children }: { children?: React.ReactNode }) {
   }, [])
 
   const menuItems = [
-    { name: "Dashboard", icon: Home, href: "/dashboard" },
+    { name: "Inicio", icon: Home, href: "/simulator" },
     { name: "Simulador de Bonos", icon: Calculator, href: "/simulator" },
     { name: "Mis Bonos", icon: FileText, href: "/bonds" },
     { name: "Gestión de Bonos", icon: Package, href: "/bond" },

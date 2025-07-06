@@ -61,7 +61,7 @@ export default function HeaderOptions() {
 	];
 
 	const adminNavigationItems = [
-		{ href: routesConfig.private.dashboard.path, label: "Dashboard" },
+		{ href: routesConfig.private.dashboard.path, label: "simulator" },
 		{ href: routesConfig.private.admin.path, label: "Admin Panel" },
 	];
 
