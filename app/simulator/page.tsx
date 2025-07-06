@@ -1,13 +1,15 @@
- "use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Calculator, TrendingUp, Calendar, DollarSign, Info, Play, RotateCcw, ArrowRight, CheckCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useForm, FormProvider, Controller } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 import { DatePicker } from "@/components/ui/date-picker";
+import { Input } from "@/components/ui/input";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const tabs = [
   { id: "datos-basicos", label: "Datos Básicos", icon: Calculator },
@@ -16,27 +18,25 @@ const tabs = [
   { id: "adicionales", label: "Adicionales", icon: Info },
 ];
 
-const bondSchema = z.object({
-  monto: z.string().min(1, "El monto es requerido").refine((v) => !isNaN(Number(v)) && Number(v) > 0, { message: "El monto debe ser mayor a 0" }),
-  currency: z.enum(["PEN", "USD"]),
-  plazo: z.string().min(1, "El plazo es requerido").refine((v) => !isNaN(Number(v)) && Number(v) > 0, { message: "El plazo debe ser mayor a 0" }),
-  fechaInicio: z.string().min(1, "La fecha de inicio es requerida"),
-  rateType: z.enum(["effective", "nominal"]),
-  rateValue: z.string().min(1, "La tasa es requerida").refine((v) => !isNaN(Number(v)) && Number(v) > 0, { message: "La tasa debe ser mayor a 0" }),
-  capitalization: z.string().optional(),
-  graceType: z.enum(["none", "total", "partial"]),
-  gracePeriod: z.string().optional(),
-  insurance: z.boolean(),
-  commission: z.boolean(),
-});
-
-type BondFormType = z.infer<typeof bondSchema>;
+type BondFormType = {
+  monto: string;
+  currency: "PEN" | "USD";
+  plazo: string;
+  fechaInicio: Date;
+  rateType: "effective" | "nominal";
+  rateValue: string;
+  capitalization?: string;
+  graceType: "none" | "total" | "partial";
+  gracePeriod?: string;
+  insurance: boolean;
+  commission: boolean;
+};
 
 const defaultValues: BondFormType = {
   monto: "10000",
   currency: "PEN",
   plazo: "24",
-  fechaInicio: "2025-07-01",
+  fechaInicio: new Date(),
   rateType: "effective",
   rateValue: "12",
   capitalization: "monthly",
@@ -51,11 +51,10 @@ const SimulatorPage = () => {
   const [activeTab, setActiveTab] = useState("datos-basicos");
   const [formError, setFormError] = useState("");
   const methods = useForm<BondFormType>({
-    resolver: zodResolver(bondSchema),
     defaultValues,
     mode: "onTouched",
   });
-  const { register, handleSubmit, watch, trigger, formState: { errors } } = methods;
+  const { control, handleSubmit, watch, trigger, formState: { errors }, reset } = methods;
 
   const handleNext = async () => {
     let fieldsToValidate: (keyof BondFormType)[] = [];
@@ -84,14 +83,13 @@ const SimulatorPage = () => {
 
   const handleClear = () => {
     if (window.confirm("¿Seguro que deseas limpiar el formulario?")) {
-      methods.reset(defaultValues);
+      reset(defaultValues);
       setActiveTab("datos-basicos");
       setFormError("");
     }
   };
 
   const onSubmit = (data: BondFormType) => {
-    console.log("[Simulador] Datos enviados al calcular:", data);
     const encodedData = encodeURIComponent(JSON.stringify({
       amount: Number(data.monto),
       currency: data.currency,
@@ -101,7 +99,7 @@ const SimulatorPage = () => {
       capitalization: data.rateType === "nominal" ? data.capitalization : undefined,
       gracePeriod: data.graceType !== "none" ? Number(data.gracePeriod) : 0,
       graceType: data.graceType,
-      startDate: data.fechaInicio,
+      startDate: data.fechaInicio.toISOString().slice(0, 10),
       insurance: data.insurance,
       commission: data.commission,
     }));
@@ -180,60 +178,86 @@ const SimulatorPage = () => {
                 <div className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Monto del Bono */}
-                    <div className="space-y-3">
-                      <label htmlFor="monto" className="block text-sm font-semibold text-gray-900 dark:text-white">Monto del Bono</label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                          <DollarSign className="h-5 w-5 text-gray-400" />
+                    <Controller
+                      control={control}
+                      name="monto"
+                      rules={{
+                        required: "El monto es requerido",
+                        validate: (v) => !isNaN(Number(v)) && Number(v) > 0 || "El monto debe ser mayor a 0"
+                      }}
+                      render={({ field }) => (
+                        <div className="space-y-3">
+                          <label htmlFor="monto" className="block text-sm font-semibold text-gray-900 dark:text-white">Monto del Bono</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <DollarSign className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <Input
+                              id="monto"
+                              type="number"
+                              min="1"
+                              {...field}
+                              className="block w-full pl-12 pr-4 py-4 text-lg border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                              placeholder="Ingresa el monto"
+                              aria-describedby="monto-help"
+                            />
+                            <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                              <Controller
+                                control={control}
+                                name="currency"
+                                render={({ field: currencyField }) => (
+                                  <Select onValueChange={currencyField.onChange} defaultValue={currencyField.value}>
+                                    <SelectTrigger className="text-sm text-gray-500 dark:text-gray-400 bg-transparent border-none focus:ring-0">
+                                      <SelectValue placeholder="Moneda" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="PEN">S/ (PEN)</SelectItem>
+                                      <SelectItem value="USD">$ (USD)</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                              />
+                            </div>
+                          </div>
+                          <p id="monto-help" className="text-sm text-gray-500 dark:text-gray-400">Valor nominal del bono en la moneda seleccionada</p>
+                          {errors.monto && <span className="text-red-500 text-xs">{errors.monto.message}</span>}
                         </div>
-                        <input
-                          id="monto"
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          {...register('monto')}
-                          className="block w-full pl-12 pr-4 py-4 text-lg border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
-                          placeholder="Ingresa el monto"
-                          aria-describedby="monto-help"
-                        />
-                        <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-                          <select
-                            className="text-sm text-gray-500 dark:text-gray-400 bg-transparent border-none focus:ring-0"
-                            aria-label="Moneda"
-                            {...register('currency')}
-                          >
-                            <option value="PEN">S/ (PEN)</option>
-                            <option value="USD">$ (USD)</option>
-                          </select>
-                        </div>
-                      </div>
-                      <p id="monto-help" className="text-sm text-gray-500 dark:text-gray-400">Valor nominal del bono en la moneda seleccionada</p>
-                      {errors.monto && <span className="text-red-500 text-xs">{errors.monto.message}</span>}
-                    </div>
+                      )}
+                    />
                     {/* Plazo */}
-                    <div className="space-y-3">
-                      <label htmlFor="plazo" className="block text-sm font-semibold text-gray-900 dark:text-white">Plazo (en meses)</label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                          <Calendar className="h-5 w-5 text-gray-400" />
+                    <Controller
+                      control={control}
+                      name="plazo"
+                      rules={{
+                        required: "El plazo es requerido",
+                        validate: (v) => !isNaN(Number(v)) && Number(v) > 0 || "El plazo debe ser mayor a 0"
+                      }}
+                      render={({ field }) => (
+                        <div className="space-y-3">
+                          <label htmlFor="plazo" className="block text-sm font-semibold text-gray-900 dark:text-white">Plazo (dddd meses)</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                              <Calendar className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <Input
+                              id="plazo"
+                              type="number"
+                              min="1"
+                              {...field}
+                              className="block w-full pl-12 pr-4 py-4 text-lg border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                              placeholder="24"
+                              aria-describedby="plazo-help"
+                            />
+                          </div>
+                          <p id="plazo-help" className="text-sm text-gray-500 dark:text-gray-400">Duración del bono en meses (ej: 24 meses = 2 años)</p>
+                          {errors.plazo && <span className="text-red-500 text-xs">{errors.plazo.message}</span>}
                         </div>
-                        <input
-                          id="plazo"
-                          type="number"
-                          min="1"
-                          {...register('plazo')}
-                          className="block w-full pl-12 pr-4 py-4 text-lg border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
-                          placeholder="24"
-                          aria-describedby="plazo-help"
-                        />
-                      </div>
-                      <p id="plazo-help" className="text-sm text-gray-500 dark:text-gray-400">Duración del bono en meses (ej: 24 meses = 2 años)</p>
-                      {errors.plazo && <span className="text-red-500 text-xs">{errors.plazo.message}</span>}
-                    </div>
+                      )}
+                    />
                   </div>
                   {/* Fecha de Inicio */}
                   <Controller
-                    control={methods.control}
+                    control={control}
                     name="fechaInicio"
                     rules={{ required: "La fecha de inicio es obligatoria" }}
                     render={({ field }) => (
@@ -242,13 +266,9 @@ const SimulatorPage = () => {
                           Fecha de Inicio
                         </label>
                         <DatePicker
-                          date={field.value ? new Date(field.value) : undefined}
-                          setDate={(date) => {
-                            const formatted = date ? date.toISOString().slice(0, 10) : "";
-                            field.onChange(formatted);
-                          }}
+                          date={field.value}
+                          setDate={field.onChange}
                           placeholder="Seleccionar fecha"
-                          format="yyyy-MM-dd"
                         />
                         {errors.fechaInicio && <span className="text-red-500 text-xs">{errors.fechaInicio.message}</span>}
                       </div>
@@ -260,44 +280,72 @@ const SimulatorPage = () => {
                 <div className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Tipo de Tasa */}
-                    <div className="space-y-3">
-                      <label className="block text-sm font-semibold text-gray-900 dark:text-white">Tipo de Tasa</label>
-                      <select
-                        className="block w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
-                        {...register('rateType')}
-                      >
-                        <option value="effective">Efectiva</option>
-                        <option value="nominal">Nominal</option>
-                      </select>
-                    </div>
+                    <Controller
+                      control={control}
+                      name="rateType"
+                      rules={{ required: "El tipo de tasa es requerido" }}
+                      render={({ field }) => (
+                        <div className="space-y-3">
+                          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Tipo de Tasa</label>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccionar tipo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="effective">Efectiva</SelectItem>
+                              <SelectItem value="nominal">Nominal</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                    />
                     {/* Valor de la Tasa */}
-                    <div className="space-y-3">
-                      <label className="block text-sm font-semibold text-gray-900 dark:text-white">Valor de la Tasa (%)</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        {...register('rateValue')}
-                        className="block w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
-                        placeholder="12.00"
-                      />
-                      {errors.rateValue && <span className="text-red-500 text-xs">{errors.rateValue.message}</span>}
-                    </div>
+                    <Controller
+                      control={control}
+                      name="rateValue"
+                      rules={{
+                        required: "La tasa es requerida",
+                        validate: (v) => !isNaN(Number(v)) && Number(v) > 0 || "La tasa debe ser mayor a 0"
+                      }}
+                      render={({ field }) => (
+                        <div className="space-y-3">
+                          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Valor de la Tasa (%)</label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            {...field}
+                            className="block w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                            placeholder="12.00"
+                          />
+                          {errors.rateValue && <span className="text-red-500 text-xs">{errors.rateValue.message}</span>}
+                        </div>
+                      )}
+                    />
                   </div>
                   {/* Capitalización (solo si es nominal) */}
                   {rateType === "nominal" && (
-                    <div className="space-y-3">
-                      <label className="block text-sm font-semibold text-gray-900 dark:text-white">Período de Capitalización</label>
-                      <select
-                        className="block w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
-                        {...register('capitalization')}
-                      >
-                        <option value="monthly">Mensual</option>
-                        <option value="bimonthly">Bimestral</option>
-                        <option value="quarterly">Trimestral</option>
-                        <option value="biannual">Semestral</option>
-                        <option value="annual">Anual</option>
-                      </select>
-                    </div>
+                    <Controller
+                      control={control}
+                      name="capitalization"
+                      rules={rateType === "nominal" ? { required: "La capitalización es requerida" } : {}}
+                      render={({ field }) => (
+                        <div className="space-y-3">
+                          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Período de Capitalización</label>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccionar periodo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="monthly">Mensual</SelectItem>
+                              <SelectItem value="bimonthly">Bimestral</SelectItem>
+                              <SelectItem value="quarterly">Trimestral</SelectItem>
+                              <SelectItem value="biannual">Semestral</SelectItem>
+                              <SelectItem value="annual">Anual</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                    />
                   )}
                 </div>
               )}
@@ -305,30 +353,49 @@ const SimulatorPage = () => {
                 <div className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Tipo de Gracia */}
-                    <div className="space-y-3">
-                      <label className="block text-sm font-semibold text-gray-900 dark:text-white">Tipo de Gracia</label>
-                      <select
-                        className="block w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
-                        {...register('graceType')}
-                      >
-                        <option value="none">Sin gracia</option>
-                        <option value="total">Gracia total</option>
-                        <option value="partial">Gracia parcial</option>
-                      </select>
-                    </div>
+                    <Controller
+                      control={control}
+                      name="graceType"
+                      rules={{ required: "El tipo de gracia es requerido" }}
+                      render={({ field }) => (
+                        <div className="space-y-3">
+                          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Tipo de Gracia</label>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccionar tipo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Sin gracia</SelectItem>
+                              <SelectItem value="total">Gracia total</SelectItem>
+                              <SelectItem value="partial">Gracia parcial</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                    />
                     {/* Período de Gracia (solo si aplica) */}
                     {graceType !== "none" && (
-                      <div className="space-y-3">
-                        <label className="block text-sm font-semibold text-gray-900 dark:text-white">Duración del Período de Gracia (meses)</label>
-                        <input
-                          type="number"
-                          min="0"
-                          {...register('gracePeriod')}
-                          className="block w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
-                          placeholder="0"
-                        />
-                        {errors.gracePeriod && <span className="text-red-500 text-xs">{errors.gracePeriod.message}</span>}
-                      </div>
+                      <Controller
+                        control={control}
+                        name="gracePeriod"
+                        rules={graceType && graceType !== "none" ? {
+                          required: "El período de gracia es requerido",
+                          validate: (v) => !isNaN(Number(v)) && Number(v) >= 0 || "El período de gracia debe ser 0 o mayor"
+                        } : {}}
+                        render={({ field }) => (
+                          <div className="space-y-3">
+                            <label className="block text-sm font-semibold text-gray-900 dark:text-white">Duración del Período de Gracia (meses)</label>
+                            <Input
+                              type="number"
+                              min="0"
+                              {...field}
+                              className="block w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                              placeholder="0"
+                            />
+                            {errors.gracePeriod && <span className="text-red-500 text-xs">{errors.gracePeriod.message}</span>}
+                          </div>
+                        )}
+                      />
                     )}
                   </div>
                 </div>
@@ -337,25 +404,35 @@ const SimulatorPage = () => {
                 <div className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Seguro de Desgravamen */}
-                    <div className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        id="insurance"
-                        {...register('insurance')}
-                        className="form-checkbox h-5 w-5 text-green-600"
-                      />
-                      <label htmlFor="insurance" className="text-sm font-semibold text-gray-900 dark:text-white">Seguro de Desgravamen</label>
-                    </div>
+                    <Controller
+                      control={control}
+                      name="insurance"
+                      render={({ field }) => (
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            id="insurance"
+                          />
+                          <label htmlFor="insurance" className="text-sm font-semibold text-gray-900 dark:text-white">Seguro de Desgravamen</label>
+                        </div>
+                      )}
+                    />
                     {/* Comisión por Servicio */}
-                    <div className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        id="commission"
-                        {...register('commission')}
-                        className="form-checkbox h-5 w-5 text-green-600"
-                      />
-                      <label htmlFor="commission" className="text-sm font-semibold text-gray-900 dark:text-white">Comisión por Servicio</label>
-                    </div>
+                    <Controller
+                      control={control}
+                      name="commission"
+                      render={({ field }) => (
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            id="commission"
+                          />
+                          <label htmlFor="commission" className="text-sm font-semibold text-gray-900 dark:text-white">Comisión por Servicio</label>
+                        </div>
+                      )}
+                    />
                   </div>
                 </div>
               )}

@@ -316,7 +316,7 @@ export default function BondForm() {
             name="startDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Fecha de Inicio</FormLabel>
+                <FormLabel>Fecha de dddddddddddddd</FormLabel>
                 <DatePicker
                   date={field.value}
                   setDate={field.onChange}
