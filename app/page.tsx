@@ -10,5 +10,5 @@ export default async function RootPage() {
     redirect('/sign-in');
   }
   
-  redirect('/bonds');
-} 
+  redirect('/simulator');
+}   
