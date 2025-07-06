@@ -52,7 +52,8 @@ export const signInAction = async (formData: FormData) => {
     redirect(`/sign-in?type=error&message=${encodeURIComponent(error.message)}`);
   }
 
-  redirect(routesConfig.public.home.path, RedirectType.push);
+  // Redirigir a /simulator después de iniciar sesión correctamente
+  redirect('/simulator');
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {
