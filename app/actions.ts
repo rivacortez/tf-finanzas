@@ -52,8 +52,8 @@ export const signInAction = async (formData: FormData) => {
     redirect(`/sign-in?type=error&message=${encodeURIComponent(error.message)}`);
   }
 
-  // Redirigir a /simulator después de iniciar sesión correctamente
-  redirect('/simulator');
+  // Redirigir a la calculadora de bonos franceses después de iniciar sesión correctamente
+  redirect('/simulator/bono-frances');
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {

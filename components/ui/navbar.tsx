@@ -22,8 +22,8 @@ export function Navbar({ children }: { children?: React.ReactNode }) {
   }, [])
 
   const menuItems = [
-    { name: "Inicio", icon: Home, href: "/simulator" },
-    { name: "Simulador de Bonos", icon: Calculator, href: "/simulator" },
+    { name: "Inicio", icon: Home, href: "/simulator/bono-frances" },
+    { name: "Simulador de Bonos", icon: Calculator, href: "/simulator/bono-frances" },
     { name: "Mis Bonos", icon: FileText, href: "/bonds" },
     { name: "Gestión de Bonos", icon: Package, href: "/bond" },
     { name: "Documentación", icon: BookOpen, href: "/documentation" },
@@ -100,7 +100,7 @@ export function Navbar({ children }: { children?: React.ReactNode }) {
             <div className="flex-1 overflow-y-auto px-3 space-y-2">
               {menuItems.map((item) => (
                 <Link
-                  key={item.href}
+                  key={item.name}
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
                   className={`group flex items-center rounded-xl transition-all duration-300 ${
@@ -111,7 +111,7 @@ export function Navbar({ children }: { children?: React.ReactNode }) {
                 >
                   <item.icon
                     size={20}
-                    className={`$ {
+                    className={`${
                       pathname === item.href
                         ? "text-primary-500"
                         : "text-gray-500 dark:text-gray-400 group-hover:text-primary-500 dark:group-hover:text-primary-400"

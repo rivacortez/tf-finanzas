@@ -1,7 +1,7 @@
 export const routesConfig = {
     public: {
       home: {
-        path: '/simulator'
+        path: '/simulator/bono-frances'
       },
       signIn: {
         path: '/sign-in'
@@ -18,7 +18,7 @@ export const routesConfig = {
     },
     private: {
       dashboard: {
-        path: '/dashboard',
+        path: '/simulator/bono-frances',
         roles: ['admin']
       },
       profile: {

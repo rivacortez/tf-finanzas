@@ -56,12 +56,12 @@ export default function HeaderOptions() {
 	}, [fetchUserRoles]);
 
 	const generalNavigationItems = [
-		{ href: routesConfig.public.home.path, label: "Inicio" },
+		{ href: routesConfig.public.home.path, label: "Calculadora Bonos" },
 		
 	];
 
 	const adminNavigationItems = [
-		{ href: routesConfig.private.dashboard.path, label: "simulator" },
+		{ href: routesConfig.private.dashboard.path, label: "Calculadora Bonos" },
 		{ href: routesConfig.private.admin.path, label: "Admin Panel" },
 	];
 

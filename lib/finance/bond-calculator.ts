@@ -417,3 +417,367 @@ export function generatePaymentSchedule(params: BondParams): { schedule: Payment
   
   return { schedule, indicators };
 }
+
+// Interfaces para bonos corporativos (método francés)
+export interface CorporateBondInput {
+  valorNominal: number;        // Valor Nominal del bono
+  valorComercial: number;      // Valor Comercial del bono
+  nDeAnos: number;             // Número de años
+  frecuenciaCuponDias: number; // Frecuencia del cupón en días
+  diasXAno: number;            // Días por año (360/365)
+  tipoTasaInteres: string;     // Efectiva/Nominal
+  tasaInteresAnual: number;    // Tasa de interés anual (%)
+  tasaDescuento: number;       // Tasa anual de descuento (COK) (%)
+  impuestoRenta: number;       // Impuesto a la renta (%)
+  fechaEmision: string;        // Fecha de emisión
+  inflacionAnual: number;      // Tasa de inflación anual (%)
+  costos: {
+    prima: { porcentaje: number, aplicaA: 'Emisor' | 'Bonista' | 'Ambos' };
+    estructuracion: { porcentaje: number, aplicaA: 'Emisor' | 'Bonista' | 'Ambos' };
+    colocacion: { porcentaje: number, aplicaA: 'Emisor' | 'Bonista' | 'Ambos' };
+    flotacion: { porcentaje: number, aplicaA: 'Emisor' | 'Bonista' | 'Ambos' };
+    cavali: { porcentaje: number, aplicaA: 'Emisor' | 'Bonista' | 'Ambos' };
+  };
+}
+
+export interface CorporateBondRow {
+  n: number;                    // Número de periodo
+  fechaProgramada: string;      // Fecha programada de pago
+  inflacionAnual: number;       // Inflación anual
+  inflacionPeriodica: number;   // Inflación del periodo
+  plazoGracia: string;          // Tipo de plazo de gracia (S/T/P)
+  bono: number;                 // Valor del bono inicial
+  bonoIndexado: number;         // Bono ajustado por inflación
+  cuponInteres: number;         // Interés del periodo
+  cuota: number;                // Cuota total
+  amortizacion: number;         // Amortización
+  prima: number;                // Prima (si aplica)
+  escudo: number;               // Escudo fiscal
+  flujoEmisor: number;          // Flujo para el emisor
+  flujoEmisorConEscudo: number; // Flujo para el emisor con escudo fiscal
+  flujoBonista: number;         // Flujo para el bonista
+  flujoActualizado: number;     // Flujo actualizado (para cálculos de duración)
+  faPorPlazo: number;           // Flujo actualizado por plazo (para duración)
+  factorConvexidad: number;     // Factor para convexidad
+}
+
+export interface CorporateBondResults {
+  // Parámetros calculados
+  nPeriodosPorAno: number;
+  nTotalPeriodos: number;
+  diasCapitalizacion: number;
+  tasaEfectivaPeriodica: number;
+  cokPeriodico: number;
+  inflacionPeriodica: number;
+  // Costos
+  costesInicialesEmisor: number;
+  costesInicialesBonista: number;
+  // Indicadores
+  precioActual: number;
+  utilidadPerdida: number;
+  duracion: number;
+  convexidad: number;
+  duracionModificada: number;
+  total: number; // Duración + Convexidad
+  tceaEmisor: number;
+  tceaEmisorConEscudo: number;
+  treaBonista: number;
+  // Tabla de amortización
+  tablaAmortizacion: CorporateBondRow[];
+}
+
+/**
+ * Calcula todos los resultados para un bono corporativo usando el método francés
+ * @param input Parámetros del bono corporativo
+ * @returns Resultados completos del bono corporativo
+ */
+export function calcularBonoFrances(input: CorporateBondInput): CorporateBondResults {
+  const {
+    valorNominal,
+    valorComercial,
+    nDeAnos,
+    frecuenciaCuponDias,
+    diasXAno,
+    tasaInteresAnual,
+    tasaDescuento,
+    impuestoRenta,
+    fechaEmision,
+    inflacionAnual,
+    costos
+  } = input;
+
+  // 1. Cálculo de parámetros básicos
+  const nPeriodosPorAno = diasXAno / frecuenciaCuponDias;
+  const nTotalPeriodos = Math.round(nDeAnos * nPeriodosPorAno);
+  
+  // Calcular días de capitalización según la fórmula exacta de Excel
+  const diasCapitalizacion = calcularDiasCapitalizacion(frecuenciaCuponDias);
+  
+  // 2. Conversión de tasas según fórmulas exactas de Excel
+  // L9: =(1+L8)^(L4/E8)-1 donde L8=tasa anual (7.5%), L4=frecuencia cupón (180), E8=días año (360)
+  const tasaEfectivaAnual = tasaInteresAnual / 100;
+  const tasaEfectivaPeriodica = Math.pow(1 + tasaEfectivaAnual, frecuenciaCuponDias / diasXAno) - 1;
+  
+  // L10: =(1+E12)^(L4/E8)-1 donde E12=COK anual (4.5%)
+  const cokPeriodico = Math.pow(1 + (tasaDescuento / 100), frecuenciaCuponDias / diasXAno) - 1;
+  
+  // 3. Cálculo de costos iniciales según las fórmulas de Excel
+  // L11: =SUMA($E$17:$E$20)*E5 (Costos Iniciales Emisor)
+  // L12: =SUMA($E$19:$E$20)*E5 (Costos Iniciales Bonista)
+  
+  // Costos que aplican al Emisor (Prima, Estructuración, Colocación, Flotación, CAVALI)
+  const porcentajesPrimaEmisor = (costos.prima.aplicaA === 'Emisor' || costos.prima.aplicaA === 'Ambos') ? costos.prima.porcentaje : 0;
+  const porcentajesEstructuracionEmisor = (costos.estructuracion.aplicaA === 'Emisor' || costos.estructuracion.aplicaA === 'Ambos') ? costos.estructuracion.porcentaje : 0;
+  const porcentajesColocacionEmisor = (costos.colocacion.aplicaA === 'Emisor' || costos.colocacion.aplicaA === 'Ambos') ? costos.colocacion.porcentaje : 0;
+  const porcentajesFlotacionEmisor = (costos.flotacion.aplicaA === 'Emisor' || costos.flotacion.aplicaA === 'Ambos') ? costos.flotacion.porcentaje : 0;
+  const porcentajesCAVALIEmisor = (costos.cavali.aplicaA === 'Emisor' || costos.cavali.aplicaA === 'Ambos') ? costos.cavali.porcentaje : 0;
+  
+  const costesInicialesEmisor = (porcentajesPrimaEmisor + porcentajesEstructuracionEmisor + porcentajesColocacionEmisor + porcentajesFlotacionEmisor + porcentajesCAVALIEmisor) * valorComercial / 100;
+  
+  // Costos que aplican al Bonista (solo Flotación y CAVALI según la imagen)
+  const porcentajesFlotacionBonista = (costos.flotacion.aplicaA === 'Bonista' || costos.flotacion.aplicaA === 'Ambos') ? costos.flotacion.porcentaje : 0;
+  const porcentajesCAVALIBonista = (costos.cavali.aplicaA === 'Bonista' || costos.cavali.aplicaA === 'Ambos') ? costos.cavali.porcentaje : 0;
+  
+  const costesInicialesBonista = (porcentajesFlotacionBonista + porcentajesCAVALIBonista) * valorComercial / 100;
+  
+  // 4. Cálculo de la cuota constante (método francés)
+  // Para bonos con inflación, la cuota se calcula sobre el valor nominal inicial
+  const cuotaConstante = calculatePayment(valorNominal, tasaEfectivaPeriodica, nTotalPeriodos);
+  
+  // 5. Generación de la tabla de amortización con ajustes por inflación
+  const tablaAmortizacion: CorporateBondRow[] = [];
+  let saldoBono = valorNominal;
+  
+  // Calcular fechas de pago
+  const fechaBase = new Date(fechaEmision);
+  const fechas: string[] = [];
+  
+  for (let i = 1; i <= nTotalPeriodos; i++) {
+    const nuevaFecha = new Date(fechaBase);
+    // Agregar meses según la frecuencia
+    if (frecuenciaCuponDias === 180) { // Semestral
+      nuevaFecha.setMonth(nuevaFecha.getMonth() + (6 * i));
+    } else if (frecuenciaCuponDias === 90) { // Trimestral
+      nuevaFecha.setMonth(nuevaFecha.getMonth() + (3 * i));
+    } else if (frecuenciaCuponDias === 30) { // Mensual
+      nuevaFecha.setMonth(nuevaFecha.getMonth() + i);
+    } else { // Anual
+      nuevaFecha.setFullYear(nuevaFecha.getFullYear() + i);
+    }
+    fechas.push(nuevaFecha.toLocaleDateString('es-ES'));
+  }
+  
+  // Generar la tabla de amortización
+  // Agregar periodo 0 (inicial) como en Excel
+  tablaAmortizacion.push({
+    n: 0,
+    fechaProgramada: fechaBase.toLocaleDateString('es-ES'),
+    inflacionAnual: inflacionAnual,
+    inflacionPeriodica: 0, // Sin inflación en el periodo inicial según la condición SI
+    plazoGracia: 'S',
+    bono: valorNominal,
+    bonoIndexado: valorNominal,
+    cuponInteres: 0, // Sin interés en el periodo inicial
+    cuota: 0, // Sin cuota en el periodo inicial
+    amortizacion: 0, // Sin amortización en el periodo inicial
+    prima: 0,
+    escudo: 0,
+    flujoEmisor: valorComercial - costesInicialesEmisor, // Flujo positivo para el emisor
+    flujoEmisorConEscudo: valorComercial - costesInicialesEmisor, // Igual sin escudo en periodo inicial
+    flujoBonista: -valorComercial - costesInicialesBonista, // Flujo negativo para el bonista
+    flujoActualizado: 0,
+    faPorPlazo: 0,
+    factorConvexidad: 0
+  });
+  
+  for (let i = 0; i < nTotalPeriodos; i++) {
+    const periodoActual = i + 1;
+    
+    // Cálculo de inflación periódica según fórmula de Excel:
+    // =SI(A28<=$L$7;POTENCIA(1+C28;$L$4/$E$8)-1;0)
+    // Si el período actual <= total de períodos, entonces calcular inflación periódica, sino 0
+    const inflacionPeriodica = periodoActual <= nTotalPeriodos ? 
+      Math.pow(1 + (inflacionAnual / 100), frecuenciaCuponDias / diasXAno) - 1 : 0;
+    
+    // Ajuste por inflación del bono
+    const bonoIndexado = saldoBono * Math.pow(1 + inflacionPeriodica, i + 1);
+    
+    // Cálculo de intereses sobre el bono indexado
+    const interesPeriodo = bonoIndexado * tasaEfectivaPeriodica;
+    
+    // La cuota es constante según el método francés
+    const cuotaPeriodo = cuotaConstante;
+    
+    // Amortización = Cuota - Interés
+    const amortizacionPeriodo = cuotaPeriodo - interesPeriodo;
+    
+    // Escudo fiscal sobre el interés
+    const escudoFiscal = interesPeriodo * (impuestoRenta / 100);
+    
+    // Flujos de caja
+    const flujoEmisor = -cuotaPeriodo;
+    const flujoEmisorConEscudo = -cuotaPeriodo + escudoFiscal;
+    const flujoBonista = cuotaPeriodo;
+    
+    // Agregar a la tabla
+    tablaAmortizacion.push({
+      n: periodoActual,
+      fechaProgramada: fechas[i],
+      inflacionAnual: inflacionAnual,
+      inflacionPeriodica: inflacionPeriodica,
+      plazoGracia: 'S', // Sin plazo de gracia
+      bono: saldoBono,
+      bonoIndexado: bonoIndexado,
+      cuponInteres: -interesPeriodo, // Negativo porque es salida
+      cuota: -cuotaPeriodo, // Negativo porque es salida
+      amortizacion: -amortizacionPeriodo, // Negativo porque es salida
+      prima: 0, // Sin prima durante el flujo regular
+      escudo: escudoFiscal,
+      flujoEmisor: flujoEmisor,
+      flujoEmisorConEscudo: flujoEmisorConEscudo,
+      flujoBonista: flujoBonista,
+      flujoActualizado: 0, // Se calculará después
+      faPorPlazo: 0, // Se calculará después
+      factorConvexidad: 0 // Se calculará después
+    });
+    
+    // Actualizar el saldo del bono para el siguiente periodo
+    saldoBono = saldoBono - amortizacionPeriodo;
+    
+    // Corrección para evitar errores de redondeo en el último periodo
+    if (i === nTotalPeriodos - 1) {
+      saldoBono = 0;
+    }
+  }
+  // 6. Cálculo del Precio Actual y VAN según marco conceptual
+  // Precio Actual = Valor presente de todos los flujos futuros del bonista (excluyendo periodo 0)
+  const flujosBonistaFuturos = tablaAmortizacion
+    .filter(row => row.n > 0) // Excluir periodo 0
+    .map(row => row.flujoBonista);
+  
+  // Precio Actual = Σ[CFt / (1+r)^t] donde CFt son los flujos del bonista
+  let precioActual = 0;
+  for (let i = 0; i < flujosBonistaFuturos.length; i++) {
+    precioActual += flujosBonistaFuturos[i] / Math.pow(1 + cokPeriodico, i + 1);
+  }
+  
+  // VAN = -Inversión Inicial + Valor Presente de Flujos Futuros
+  // VAN = -P + Σ[VF / (1+r)^n] donde P es la inversión inicial
+  const inversionInicial = valorComercial + costesInicialesBonista;
+  const utilidadPerdida = precioActual - inversionInicial;
+  
+  // 7. Cálculo de duración y convexidad según marco conceptual
+  let sumatoriaFAxPlazo = 0;
+  let sumatoriaFactorConvexidad = 0;
+  
+  // Solo considerar periodos futuros (n > 0) para duración y convexidad
+  const periodosFuturos = tablaAmortizacion.filter(row => row.n > 0);
+  
+  periodosFuturos.forEach((row, index) => {
+    const t = index + 1; // Periodo (empezando en 1)
+    
+    // Flujo actualizado usando la fórmula: CFt / (1+r)^t
+    const flujoActualizado = row.flujoBonista / Math.pow(1 + cokPeriodico, t);
+    row.flujoActualizado = flujoActualizado;
+    
+    // Para duración: D = Σ[t * CFt / (1+r)^t] / Σ[CFt / (1+r)^t]
+    // Numerador: t * CFt / (1+r)^t
+    const faPorPlazo = t * flujoActualizado;
+    row.faPorPlazo = faPorPlazo;
+    sumatoriaFAxPlazo += faPorPlazo;
+    
+    // Para convexidad: C = Σ[t * CFt * (t+1) / (1+r)^(t+2)] / Σ[CFt / (1+r)^t]
+    const factorConvexidad = (t * row.flujoBonista * (t + 1)) / Math.pow(1 + cokPeriodico, t + 2);
+    row.factorConvexidad = factorConvexidad;
+    sumatoriaFactorConvexidad += factorConvexidad;
+  });
+  
+  // Duración = Σ[t * CFt / (1+r)^t] / Σ[CFt / (1+r)^t]  
+  const denominadorDuracion = periodosFuturos.reduce((sum, row) => sum + row.flujoActualizado, 0);
+  const duracion = sumatoriaFAxPlazo / denominadorDuracion;
+  
+  // Convexidad = Σ[t * CFt * (t+1) / (1+r)^(t+2)] / Σ[CFt / (1+r)^t]
+  const convexidad = sumatoriaFactorConvexidad / denominadorDuracion;
+  
+  // Duración modificada = D / (1 + r)
+  const duracionModificada = duracion / (1 + cokPeriodico);
+  
+  // 8. Cálculo de TIR y tasas efectivas anuales usando fórmulas del marco conceptual
+  
+  // TCEA = (CPE/M)^(360/n) - 1
+  // Donde: CPE = Costo total del préstamo, M = Monto neto recibido, n = plazo en días
+  const plazoTotalDias = nTotalPeriodos * frecuenciaCuponDias;
+  
+  // Para emisor sin escudo fiscal (solo flujos futuros)
+  const costoTotalEmisor = tablaAmortizacion
+    .filter(row => row.n > 0)
+    .reduce((sum, row) => sum + Math.abs(row.flujoEmisor), 0);
+  const montoNetoRecibidoEmisor = valorComercial - costesInicialesEmisor;
+  const tceaEmisor = Math.pow(costoTotalEmisor / montoNetoRecibidoEmisor, 360 / plazoTotalDias) - 1;
+  
+  // Para emisor con escudo fiscal (solo flujos futuros)
+  const costoTotalEmisorConEscudo = tablaAmortizacion
+    .filter(row => row.n > 0)
+    .reduce((sum, row) => sum + Math.abs(row.flujoEmisorConEscudo), 0);
+  const tceaEmisorConEscudo = Math.pow(costoTotalEmisorConEscudo / montoNetoRecibidoEmisor, 360 / plazoTotalDias) - 1;
+  
+  // TREA = (VF/M)^(360/n) - 1
+  // Donde: VF = Valor futuro recibido, M = Monto invertido, n = días del periodo
+  const valorFuturoRecibidoBonista = tablaAmortizacion
+    .filter(row => row.n > 0)
+    .reduce((sum, row) => sum + row.flujoBonista, 0);
+  const montoInvertidoBonista = valorComercial + costesInicialesBonista;
+  const treaBonista = Math.pow(valorFuturoRecibidoBonista / montoInvertidoBonista, 360 / plazoTotalDias) - 1;
+  
+  // 9. Resultados finales
+  // Calcular inflación periódica promedio de los períodos con inflación
+  const inflacionPeriodicaPromedio = Math.pow(1 + (inflacionAnual / 100), frecuenciaCuponDias / diasXAno) - 1;
+  
+  return {
+    nPeriodosPorAno,
+    nTotalPeriodos,
+    diasCapitalizacion,
+    tasaEfectivaPeriodica,
+    cokPeriodico,
+    inflacionPeriodica: inflacionPeriodicaPromedio,
+    costesInicialesEmisor,
+    costesInicialesBonista,
+    precioActual,
+    utilidadPerdida,
+    duracion,
+    convexidad,
+    duracionModificada,
+    total: duracion + convexidad,
+    tceaEmisor,
+    tceaEmisorConEscudo,
+    treaBonista,
+    tablaAmortizacion
+  };
+}
+
+/**
+ * Calcula los días de capitalización según la fórmula de Excel:
+ * =SI(E10="Diaria";1;SI(E10="Quincenal";15;SI(E10="Mensual";30;SI(E10="Bimestral";60;SI(E10="Trimestral";90;SI(E10="Cuatrimestral";120;SI(E10="Semestral";180;360)))))))
+ * @param frecuenciaCuponDias Frecuencia del cupón en días
+ * @returns Días de capitalización según la frecuencia
+ */
+export function calcularDiasCapitalizacion(frecuenciaCuponDias: number): number {
+  switch (frecuenciaCuponDias) {
+    case 1:
+      return 1;     // Diaria
+    case 15:
+      return 15;    // Quincenal
+    case 30:
+      return 30;    // Mensual
+    case 60:
+      return 60;    // Bimestral
+    case 90:
+      return 90;    // Trimestral
+    case 120:
+      return 120;   // Cuatrimestral
+    case 180:
+      return 180;   // Semestral
+    default:
+      return 360;   // Anual (por defecto)
+  }
+}
