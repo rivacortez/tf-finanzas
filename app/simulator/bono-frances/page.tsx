@@ -24,7 +24,9 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { CorporateBondInput, CorporateBondResults, calcularBonoFrances } from '@/lib/finance/bond-calculator';
+import { saveBondToHistory } from '@/lib/utils/bond-storage';
 import { CheckCircle, Calculator, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 // Valores por defecto basados en la imagen compartida
 const defaultValues: CorporateBondInput = {
@@ -289,6 +291,29 @@ export default function BonoCorporativoPage() {
       try {
         const calculatedResults = calcularBonoFrances(input);
         setResults(calculatedResults);
+        
+        // Guardar en el historial de localStorage
+        try {
+          const bondName = `Bono ${input.tipoTasaInteres} - ${new Date().toLocaleDateString('es-PE')}`;
+          const bondId = saveBondToHistory(input, calculatedResults, bondName);
+          console.log('Bono guardado en el historial con ID:', bondId);
+          
+          // Mostrar toast de éxito
+          toast.success('¡Bono calculado y guardado!', {
+            description: 'El bono se guardó en tu historial. Puedes verlo en "Mis Bonos"',
+            action: {
+              label: 'Ver Historial',
+              onClick: () => window.open('/bonds', '_blank')
+            }
+          });
+        } catch (storageError) {
+          console.warn('No se pudo guardar el bono en el historial:', storageError);
+          toast.warning('Bono calculado correctamente', {
+            description: 'Sin embargo, no se pudo guardar en el historial debido a limitaciones del navegador'
+          });
+          // No interrumpir el flujo principal si falla el guardado
+        }
+        
         setShowSuccessModal(true);
       } catch (error) {
         console.error("Error al calcular el bono:", error);
@@ -1065,6 +1090,8 @@ export default function BonoCorporativoPage() {
             <DialogDescription>
               El cálculo del bono corporativo se ha completado correctamente. 
               Puedes revisar los resultados en las pestañas &quot;Resultados&quot; y &quot;Tabla de Amortización&quot;.
+              <br /><br />
+              <span className="text-green-600 font-medium">✓ El bono se ha guardado automáticamente en tu historial</span>
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
@@ -1073,6 +1100,15 @@ export default function BonoCorporativoPage() {
               onClick={() => setShowSuccessModal(false)}
             >
               Continuar
+            </Button>
+            <Button 
+              onClick={() => {
+                setShowSuccessModal(false);
+                window.open('/bonds', '_blank');
+              }}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Ver Historial
             </Button>
           </div>
         </DialogContent>
