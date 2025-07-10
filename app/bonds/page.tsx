@@ -108,27 +108,7 @@ Calculado: ${formatDate(bond.timestamp)}`);
   };
 
   // Función para agregar datos de prueba (solo para desarrollo)
-  const addTestBond = () => {
-    const testInput: CorporateBondInput = {
-      valorNominal: 10000,
-      valorComercial: 10250,
-      nDeAnos: 5,
-      frecuenciaCuponDias: 180,
-      diasXAno: 360,
-      tipoTasaInteres: "Efectiva",
-      tasaInteresAnual: 7.5,
-      tasaDescuento: 4.5,
-      impuestoRenta: 30,
-      fechaEmision: "2025-01-10",
-      inflacionAnual: 3.5,
-      costos: {
-        prima: { porcentaje: 1.0, aplicaA: 'Emisor' },
-        estructuracion: { porcentaje: 0.45, aplicaA: 'Emisor' },
-        colocacion: { porcentaje: 0.25, aplicaA: 'Emisor' },
-        flotacion: { porcentaje: 0.15, aplicaA: 'Ambos' },
-        cavali: { porcentaje: 0.50, aplicaA: 'Ambos' }
-      }
-    };
+ 
 
     const testResults: CorporateBondResults = {
       diasCapitalizacion: 180,
