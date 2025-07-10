@@ -353,4 +353,4 @@ Calculado: ${formatDate(bond.timestamp)}`);
       )}
     </div>
   );
-}
+
