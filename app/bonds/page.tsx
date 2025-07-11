@@ -107,35 +107,6 @@ Calculado: ${formatDate(bond.timestamp)}`);
     }
   };
 
-  // Función para agregar datos de prueba (solo para desarrollo)
- 
-
-    const testResults: CorporateBondResults = {
-      diasCapitalizacion: 180,
-      nPeriodosPorAno: 2,
-      nTotalPeriodos: 10,
-      tasaPeriodicaEfectiva: 0.0367,
-      tasaPeriodicaDescuento: 0.0222,
-      cuponNominal: 375,
-      cuponReal: 375,
-      rendimientoTotal: 8750,
-      valorPresente: 9845.67,
-      duracionModificada: 4.32,
-      convexidad: 0.0234,
-      tablaAmortizacion: []
-    };
-
-    try {
-      const bondId = saveBondToHistory(testInput, testResults, 'Bono de Prueba');
-      const updatedHistory = getBondHistory();
-      setBondHistory(updatedHistory);
-      setStats(getHistoryStats());
-      console.log('Bono de prueba agregado:', bondId);
-    } catch (error) {
-      console.error('Error adding test bond:', error);
-    }
-  };
-
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('es-PE', {
       style: 'currency',
@@ -159,7 +130,15 @@ Calculado: ${formatDate(bond.timestamp)}`);
     return `Bono ${input.tipoTasaInteres} - ${input.frecuenciaCuponDias} días`;
   };
 
- 
+  if (loading || !mounted) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-8">
@@ -353,4 +332,4 @@ Calculado: ${formatDate(bond.timestamp)}`);
       )}
     </div>
   );
-
+}

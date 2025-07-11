@@ -3,53 +3,62 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { Database } from '@/app/core/interfaces/Database'
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
+  try {
+    let supabaseResponse = NextResponse.next({
+      request,
+    })
 
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+            supabaseResponse = NextResponse.next({
+              request,
+            })
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            )
+          },
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
+      }
+    )
+
+    // Verificar autenticación
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    // Rutas públicas que no requieren autenticación
+    const publicRoutes = [
+      '/sign-in',
+      '/sign-up',
+      '/auth',
+      '/auth/callback',
+      '/forgot-password',
+      '/reset-password'
+    ]
+
+    const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname.startsWith(route))
+
+    // Si no hay usuario y no es una ruta pública, redirigir a sign-in
+    if (!user && !isPublicRoute) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/sign-in'
+      return NextResponse.redirect(url)
     }
-  )
 
-  // Do not run code between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
-
-  // IMPORTANT: DO NOT REMOVE auth.getUser()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
-
-  return supabaseResponse
+    return supabaseResponse
+  } catch (error) {
+    console.error('Error in updateSession:', error)
+    // En caso de error, crear una respuesta simple
+    return NextResponse.next({
+      request,
+    })
+  }
 }

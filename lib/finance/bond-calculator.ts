@@ -525,19 +525,27 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
   // L11: =SUMA($E$17:$E$20)*E5 (Costos Iniciales Emisor)
   // L12: =SUMA($E$19:$E$20)*E5 (Costos Iniciales Bonista)
   
-  // Costos que aplican al Emisor (Prima, Estructuración, Colocación, Flotación, CAVALI)
-  const porcentajesPrimaEmisor = (costos.prima.aplicaA === 'Emisor' || costos.prima.aplicaA === 'Ambos') ? costos.prima.porcentaje : 0;
+  // Costos que aplican al Emisor (Estructuración, Colocación, Flotación, CAVALI - la Prima NO se suma según requerimiento)
+  // La prima se excluye del cálculo según especificación:
+  // const porcentajesPrimaEmisor = (costos.prima.aplicaA === 'Emisor' || costos.prima.aplicaA === 'Ambos') ? costos.prima.porcentaje : 0;
   const porcentajesEstructuracionEmisor = (costos.estructuracion.aplicaA === 'Emisor' || costos.estructuracion.aplicaA === 'Ambos') ? costos.estructuracion.porcentaje : 0;
   const porcentajesColocacionEmisor = (costos.colocacion.aplicaA === 'Emisor' || costos.colocacion.aplicaA === 'Ambos') ? costos.colocacion.porcentaje : 0;
   const porcentajesFlotacionEmisor = (costos.flotacion.aplicaA === 'Emisor' || costos.flotacion.aplicaA === 'Ambos') ? costos.flotacion.porcentaje : 0;
   const porcentajesCAVALIEmisor = (costos.cavali.aplicaA === 'Emisor' || costos.cavali.aplicaA === 'Ambos') ? costos.cavali.porcentaje : 0;
   
-  const costesInicialesEmisor = (porcentajesPrimaEmisor + porcentajesEstructuracionEmisor + porcentajesColocacionEmisor + porcentajesFlotacionEmisor + porcentajesCAVALIEmisor) * valorComercial / 100;
+  // NOTA: La prima NO se incluye en los costos iniciales del emisor según especificación
+  const costesInicialesEmisor = (porcentajesEstructuracionEmisor + porcentajesColocacionEmisor + porcentajesFlotacionEmisor + porcentajesCAVALIEmisor) * valorComercial / 100;
   
-  // Costos que aplican al Bonista (solo Flotación y CAVALI según la imagen)
+  // Costos que aplican al Bonista (Flotación y CAVALI - la Prima NO se suma según requerimiento)
+  // Estas variables se calculan para completitud pero NO se incluyen en los costos iniciales del bonista:
+  // const porcentajesPrimaBonista = (costos.prima.aplicaA === 'Bonista' || costos.prima.aplicaA === 'Ambos') ? costos.prima.porcentaje : 0;
+  // const porcentajesEstructuracionBonista = (costos.estructuracion.aplicaA === 'Bonista' || costos.estructuracion.aplicaA === 'Ambos') ? costos.estructuracion.porcentaje : 0;
+  // const porcentajesColocacionBonista = (costos.colocacion.aplicaA === 'Bonista' || costos.colocacion.aplicaA === 'Ambos') ? costos.colocacion.porcentaje : 0;
+  
   const porcentajesFlotacionBonista = (costos.flotacion.aplicaA === 'Bonista' || costos.flotacion.aplicaA === 'Ambos') ? costos.flotacion.porcentaje : 0;
   const porcentajesCAVALIBonista = (costos.cavali.aplicaA === 'Bonista' || costos.cavali.aplicaA === 'Ambos') ? costos.cavali.porcentaje : 0;
   
+  // NOTA: La prima NO se incluye en los costos iniciales del bonista según especificación
   const costesInicialesBonista = (porcentajesFlotacionBonista + porcentajesCAVALIBonista) * valorComercial / 100;
   
   // 4. Cálculo de la cuota constante (método francés)
