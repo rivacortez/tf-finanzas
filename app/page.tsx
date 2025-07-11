@@ -11,4 +11,4 @@ export default async function RootPage() {
   }
   
   redirect('/simulator/bono-frances');
-}   asdasdasdasd
+}   

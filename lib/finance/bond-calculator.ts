@@ -634,9 +634,9 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
     const escudoFiscal = interesPeriodo * (impuestoRenta / 100);
     
     // Flujos de caja
-    const flujoEmisor = (cuotaPeriodo) + primaValue;
-    const flujoEmisorConEscudo = -cuotaPeriodo + escudoFiscal;
-    const flujoBonista = cuotaPeriodo;
+    const flujoEmisor = -(cuotaPeriodo+ primaValue) ;
+    const flujoEmisorConEscudo = -cuotaPeriodo + escudoFiscal - primaValue;
+    const flujoBonista = cuotaPeriodo+ primaValue;
     
     // Agregar a la tabla
     tablaAmortizacion.push({
@@ -688,7 +688,7 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
   // 7. Cálculo de duración y convexidad según marco conceptual
   let sumatoriaFAxPlazo = 0;
   let sumatoriaFactorConvexidad = 0;
-  
+  let sumatoriaFlujoActualizado = 0;
   // Solo considerar periodos futuros (n > 0) para duración y convexidad
   const periodosFuturos = tablaAmortizacion.filter(row => row.n > 0);
   
@@ -697,8 +697,13 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
     
     // Flujo actualizado usando la fórmula: CFt / (1+r)^t
     const flujoActualizado = row.flujoBonista / Math.pow(1 + cokPeriodico, t);
-    row.flujoActualizado = flujoActualizado;
     
+  
+    sumatoriaFlujoActualizado += flujoActualizado
+ 
+
+    row.flujoActualizado = flujoActualizado;
+     
     // Para duración: D = Σ[t * CFt / (1+r)^t] / Σ[CFt / (1+r)^t]
     // Numerador: t * CFt / (1+r)^t
     const faPorPlazo = (t * flujoActualizado *frecuenciaCuponDias) / diasXAno;
@@ -716,8 +721,7 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
   const duracion = sumatoriaFAxPlazo / denominadorDuracion;
   
   // Convexidad = Σ[t * CFt * (t+1) / (1+r)^(t+2)] / Σ[CFt / (1+r)^t]
-  const convexidad = sumatoriaFactorConvexidad / denominadorDuracion;
-  
+  const convexidad = sumatoriaFactorConvexidad / (Math.pow(1 + cokPeriodico, 2)  * sumatoriaFlujoActualizado * Math.pow(diasXAno/frecuenciaCuponDias,2));  
   // Duración modificada = D / (1 + r)
   const duracionModificada = duracion / (1 + cokPeriodico);
   
