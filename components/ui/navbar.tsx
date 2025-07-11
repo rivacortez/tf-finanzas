@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { ModeToggle } from "@/components/ui/mode-toggle"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, Package, Users, FileText, Bell, Home, Calculator, BookOpen } from "lucide-react"
+import { Menu, Users, FileText, Bell, Home, Calculator, BookOpen } from "lucide-react"
 import { UserProfileMenu } from "@/components/ui/user-profile-menu"
 
 export function Navbar({ children }: { children?: React.ReactNode }) {
@@ -25,7 +25,6 @@ export function Navbar({ children }: { children?: React.ReactNode }) {
     { name: "Inicio", icon: Home, href: "/simulator/bono-frances" },
     { name: "Simulador de Bonos", icon: Calculator, href: "/simulator/bono-frances" },
     { name: "Mis Bonos", icon: FileText, href: "/bonds" },
-    { name: "Gestión de Bonos", icon: Package, href: "/bond" },
     { name: "Documentación", icon: BookOpen, href: "/documentation" },
     { name: "Perfil", icon: Users, href: "/profile" },
   ]

@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Calculator, FileText, Package, BookOpen, Users } from "lucide-react";
+import { Home, Calculator, FileText, BookOpen, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
@@ -18,7 +18,6 @@ const menuItems = [
   { name: "Inicio", icon: Home, href: "/simulator/bono-frances" },
   { name: "Calculadora Bonos", icon: Calculator, href: "/simulator/bono-frances" },
   { name: "Mis Bonos", icon: FileText, href: "/bonds" },
-  { name: "Gestión de Bonos", icon: Package, href: "/bond" },
   { name: "Documentación", icon: BookOpen, href: "/documentation" },
   { name: "Perfil", icon: Users, href: "/profile" },
 ];
