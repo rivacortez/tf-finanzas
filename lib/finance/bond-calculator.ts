@@ -550,7 +550,6 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
   
   // 4. Cálculo de la cuota constante (método francés)
   // Para bonos con inflación, la cuota se calcula sobre el valor nominal inicial
-  const cuotaConstante = calculatePayment(valorNominal, tasaEfectivaPeriodica, nTotalPeriodos);  
   
   // 5. Generación de la tabla de amortización con ajustes por inflación
   const tablaAmortizacion: CorporateBondRow[] = [];
@@ -608,7 +607,7 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
       Math.pow(1 + (inflacionAnual / 100), frecuenciaCuponDias / diasXAno) - 1 : 0;
     
     // Ajuste por inflación del bono
-    const bonoIndexado = saldoBono * Math.pow(1 + inflacionPeriodica, periodoActual);
+    const bonoIndexado = saldoBono * Math.pow(1 + inflacionPeriodica, i + 1);
     
     // Cálculo de intereses sobre el bono indexado
     const interesPeriodo = bonoIndexado * tasaEfectivaPeriodica;
@@ -652,8 +651,7 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
     });
     
     // Actualizar el saldo del bono para el siguiente periodo
-    // Para bonos con inflación, el saldo se actualiza sobre el bono indexado
-    saldoBono = bonoIndexado - amortizacionPeriodo;
+    saldoBono = saldoBono - amortizacionPeriodo;
     
     // Corrección para evitar errores de redondeo en el último periodo
     if (i === nTotalPeriodos - 1) {
