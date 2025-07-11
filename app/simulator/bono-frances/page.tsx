@@ -238,20 +238,14 @@ export default function BonoCorporativoPage() {
 
   const handleDateChange = (date: Date | undefined) => {
     if (date) {
-      // Aseguramos que la fecha sea válida y la formateamos como YYYY-MM-DD
-      try {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const formattedDate = `${year}-${month}-${day}`;
-        
-        setInput((prevInput) => ({
-          ...prevInput,
-          fechaEmision: formattedDate
-        }));
-      } catch (error) {
-        console.error("Error al formatear la fecha:", error);
-      }
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      setInput((prevInput) => ({
+        ...prevInput,
+        fechaEmision: formattedDate
+      }));
     }
   };
 
@@ -508,7 +502,15 @@ export default function BonoCorporativoPage() {
                 <div className="space-y-2">
                   <Label htmlFor="fechaEmision">Fecha de Emisión</Label>
                   <DatePicker
-                    date={input.fechaEmision ? new Date(input.fechaEmision) : undefined}
+                    date={
+                      input.fechaEmision
+                        ? new Date(
+                            Number(input.fechaEmision.slice(0, 4)),
+                            Number(input.fechaEmision.slice(5, 7)) - 1,
+                            Number(input.fechaEmision.slice(8, 10))
+                          )
+                        : undefined
+                    }
                     setDate={handleDateChange}
                     placeholder="Seleccionar fecha"
                     className="bg-gray-100 dark:bg-gray-700"
