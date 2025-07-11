@@ -527,7 +527,9 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
   
   // Costos que aplican al Emisor (Estructuración, Colocación, Flotación, CAVALI - la Prima NO se suma según requerimiento)
   // La prima se excluye del cálculo según especificación:
-  // const porcentajesPrimaEmisor = (costos.prima.aplicaA === 'Emisor' || costos.prima.aplicaA === 'Ambos') ? costos.prima.porcentaje : 0;
+   const porcentajesPrimaEmisor = costos.prima.porcentaje
+
+
   const porcentajesEstructuracionEmisor = (costos.estructuracion.aplicaA === 'Emisor' || costos.estructuracion.aplicaA === 'Ambos') ? costos.estructuracion.porcentaje : 0;
   const porcentajesColocacionEmisor = (costos.colocacion.aplicaA === 'Emisor' || costos.colocacion.aplicaA === 'Ambos') ? costos.colocacion.porcentaje : 0;
   const porcentajesFlotacionEmisor = (costos.flotacion.aplicaA === 'Emisor' || costos.flotacion.aplicaA === 'Ambos') ? costos.flotacion.porcentaje : 0;
@@ -596,7 +598,7 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
     faPorPlazo: 0,
     factorConvexidad: 0
   });
-  
+
   for (let i = 0; i < nTotalPeriodos; i++) {
     const periodoActual = i + 1;
     
@@ -607,7 +609,7 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
       Math.pow(1 + (inflacionAnual / 100), frecuenciaCuponDias / diasXAno) - 1 : 0;
     
     // Ajuste por inflación del bono
-    const bonoIndexado = saldoBono * Math.pow(1 + inflacionPeriodica, i + 1);
+    const bonoIndexado = saldoBono * (1 +inflacionPeriodica);
     
     // Cálculo de intereses sobre el bono indexado
     const interesPeriodo = bonoIndexado * tasaEfectivaPeriodica;
@@ -616,15 +618,23 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
     // Recalcular la cuota para los periodos restantes
     const restanteCuotas = nTotalPeriodos - periodoActual + 1;
     const cuotaPeriodo = calculatePayment(bonoIndexado, tasaEfectivaPeriodica, restanteCuotas);
-    
+ 
+//prima final es igual al input de prima
+ // let    primaFinal_1 = costos.prima.porcentaje
     // Amortización = Cuota - Interés
     const amortizacionPeriodo = cuotaPeriodo - interesPeriodo;
-    
+
+    let primaValue = 0;
+  if (periodoActual === nTotalPeriodos) {
+    primaValue = (costos.prima.porcentaje / 100) * bonoIndexado;
+  }
+
+  
     // Escudo fiscal sobre el interés
     const escudoFiscal = interesPeriodo * (impuestoRenta / 100);
     
     // Flujos de caja
-    const flujoEmisor = -cuotaPeriodo;
+    const flujoEmisor = (cuotaPeriodo) + primaValue;
     const flujoEmisorConEscudo = -cuotaPeriodo + escudoFiscal;
     const flujoBonista = cuotaPeriodo;
     
@@ -640,7 +650,7 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
       cuponInteres: -interesPeriodo, // Negativo porque es salida
       cuota: -cuotaPeriodo, // Negativo porque es salida
       amortizacion: -amortizacionPeriodo, // Negativo porque es salida
-      prima: 0, // Sin prima durante el flujo regular
+      prima: periodoActual === nTotalPeriodos ? (costos.prima.porcentaje / 100) * bonoIndexado : 0,
       escudo: escudoFiscal,
       flujoEmisor: flujoEmisor,
       flujoEmisorConEscudo: flujoEmisorConEscudo,
@@ -651,7 +661,7 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
     });
     
     // Actualizar el saldo del bono para el siguiente periodo
-    saldoBono = saldoBono - amortizacionPeriodo;
+    saldoBono = bonoIndexado - amortizacionPeriodo;
     
     // Corrección para evitar errores de redondeo en el último periodo
     if (i === nTotalPeriodos - 1) {
@@ -691,12 +701,12 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
     
     // Para duración: D = Σ[t * CFt / (1+r)^t] / Σ[CFt / (1+r)^t]
     // Numerador: t * CFt / (1+r)^t
-    const faPorPlazo = t * flujoActualizado;
+    const faPorPlazo = (t * flujoActualizado *frecuenciaCuponDias) / diasXAno;
     row.faPorPlazo = faPorPlazo;
     sumatoriaFAxPlazo += faPorPlazo;
     
     // Para convexidad: C = Σ[t * CFt * (t+1) / (1+r)^(t+2)] / Σ[CFt / (1+r)^t]
-    const factorConvexidad = (t * row.flujoBonista * (t + 1)) / Math.pow(1 + cokPeriodico, t + 2);
+    const factorConvexidad = (t * row.flujoActualizado * (t + 1)) 
     row.factorConvexidad = factorConvexidad;
     sumatoriaFactorConvexidad += factorConvexidad;
   });
