@@ -527,7 +527,7 @@ export function calcularBonoFrances(input: CorporateBondInput): CorporateBondRes
   
   // Costos que aplican al Emisor (Estructuración, Colocación, Flotación, CAVALI - la Prima NO se suma según requerimiento)
   // La prima se excluye del cálculo según especificación:
-   const porcentajesPrimaEmisor = costos.prima.porcentaje
+  
 
 
   const porcentajesEstructuracionEmisor = (costos.estructuracion.aplicaA === 'Emisor' || costos.estructuracion.aplicaA === 'Ambos') ? costos.estructuracion.porcentaje : 0;
